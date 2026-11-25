@@ -1,21 +1,29 @@
-# Tradutor-PROLOG — Interface Web (Item 4)
+# Tradutor Prolog
 
-Protótipo frontend local da **Interface do Tradutor** (item 4 do roteiro) para a linguagem **Prolog**, construído com HTML, CSS e JavaScript puros.
+Ambiente web para analisar programas e executar consultas em um subconjunto de Prolog.
 
-## Como abrir
+## Como executar
 
-Abra `index.html` diretamente no navegador (sem servidor ou build). Todas as saídas exibidas são **simuladas** a partir de dados fixos cadastrados em `exemplos.js`.
+Na pasta do projeto, execute o comando abaixo com Node.js 18 ou mais recente.
 
-## Estrutura dos arquivos
+```sh
+node server.js
+```
 
-- `index.html`: layout da IDE seguindo a **Aula 5** (**Editor Prolog** à esquerda; **Máquina**, **Consulta** e **Console** à direita, empilhados em telas estreitas).
-- `style.css`: identidade visual **Web Retrô** (anos 90/2000) com paleta diversificada em tons pastéis, baseada na linguagem gráfica do projeto *Trabalho de AD*.
-- `exemplos.js`: dados fixos simulados para três cenários cadastrados:
-  - **Programa válido** (`genealogia.pl`): 56 tokens, 12 símbolos, árvore de derivação completa e resposta simulada no console (`Neto = lucas ; Neto = sofia.`).
-  - **Erro léxico** (`erro_lexico.pl`): caractere inválido `$` na linha 5, coluna 12 (`LEX-001`), tabela parcial e bloqueio da árvore/consulta.
-  - **Erro sintático** (`erro_sintatico.pl`): 34 tokens válidos, falha da GLC antes de `:-` na linha 4, coluna 10 (`SIN-002`) e árvore de derivação parcial.
-- `app.js`: controles de carregamento de exemplos, compilação simulada, execução de consulta, navegação por teclado nas abas (`Tab`, `ArrowLeft`, `ArrowRight`, `Home`, `End`) e limpeza automática das saídas ao editar código ou consulta.
+Abra [o interpretador local](http://127.0.0.1:3000). Clique em **Compilar** para ver tokens, tabela de símbolos, árvore sintática e diagnósticos. Clique em **Executar consulta** ou pressione Enter no campo da consulta para ver o resultado.
 
-## Comportamento de edição
+## Subconjunto implementado
 
-Ao alterar manualmente o código no **Editor Prolog** ou o texto em **Consulta**, as saídas anteriores da **Máquina** e do **Console** são limpas imediatamente e a interface orienta o usuário a carregar um dos exemplos cadastrados para testar os controles.
+- Fatos, regras, termos compostos, variáveis, comentários e átomos entre aspas simples.
+- Unificação de termos finitos, conjunção, disjunção, recursão e busca de soluções por backtracking.
+- Aritmética com `is`, `+`, `-`, `*`, `/` e comparações numéricas.
+- Saída com `write/1`, `writeln/1` e `nl/0`.
+
+O programa exige um ponto após cada fato ou regra. A consulta aceita o prefixo `?-` e o ponto final como opcionais. Uma consulta sem variáveis nomeadas retorna ao encontrar a primeira prova. As demais retornam até 100 soluções, dentro dos limites de passos, profundidade e saída do interpretador.
+
+## API local
+
+- `POST /api/compilar` recebe `{"codigo":"pai(joao, maria)."}` e retorna os tokens, o marcador de fim, os símbolos, a árvore e os diagnósticos.
+- `POST /api/consultar` recebe `{"codigo":"pai(joao, maria).","consulta":"pai(joao, X)."}` e retorna as soluções, a saída e os erros. Uma lista vazia de soluções em uma consulta concluída indica `false`.
+
+O servidor e o interpretador ficam em `server.js` e usam apenas módulos nativos do Node.js.

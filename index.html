@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tradutor Prolog · Interface Web Retrô (Simulada)</title>
+  <title>Tradutor Prolog</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
     <div class="top-brand">
       <span class="win-glyph" aria-hidden="true">✦</span>
       <span class="address-bar mono" aria-label="Endereço simbólico do ambiente">prolog://tradutor.local/item-4</span>
-      <span class="tag ciano">Simulação local</span>
+      <span class="tag ciano">Interpretador local</span>
     </div>
 
     <div class="top-actions">
@@ -31,24 +31,21 @@
   <main>
     <section class="hero" aria-labelledby="titulo-principal">
       <div class="hero-copy">
-        <p class="mono eyebrow">Item 4 · Interface do Tradutor · Protótipo com saídas simuladas</p>
+        <p class="mono eyebrow">Item 4 · Interface do Tradutor</p>
         <h1 id="titulo-principal">Tradutor Prolog</h1>
         <p class="lead">
-          Ambiente web retrô para demonstrar análise léxica, tabela de símbolos, árvore de derivação,
-          diagnósticos e consultas usando dados fixos cadastrados.
+          Escreva um programa Prolog, inspecione tokens, símbolos e árvore sintática, e execute consultas no console.
         </p>
       </div>
       <div class="hero-r">
         <span id="statusGlobal" class="tag lil" aria-live="polite">Exemplo carregado</span>
         <span id="exemploAtivoInfo" class="mono">Exemplo ativo: Programa válido</span>
-        <span class="tag ouro">Modo: Dados simulados</span>
       </div>
     </section>
 
     <section aria-labelledby="sec-exemplos">
       <div class="rowhead">
         <h2 id="sec-exemplos">01 / Exemplos cadastrados e fluxo da máquina</h2>
-        <span class="tag pessego">Protótipo estático</span>
       </div>
 
       <div class="card pad control-deck">
@@ -69,7 +66,7 @@
             </button>
           </div>
           <p id="exemploDesc" class="note">
-            Base genealógica válida com fatos, regra recursiva simples e consulta pronta para demonstração.
+            Base genealógica com fatos, uma regra e uma consulta.
           </p>
         </div>
 
@@ -107,11 +104,7 @@
       <div id="avisoEdicao" class="card pad edit-banner" role="status" aria-live="polite" hidden>
         <div class="edit-banner-body">
           <span class="tag pessego">Saídas limpas · Edição detectada</span>
-          <p id="avisoEdicaoTexto">
-            Você editou o código ou a consulta manualmente. Como esta interface exibe apenas saídas
-            <strong>simuladas</strong> para cenários cadastrados, as saídas anteriores foram limpas.
-            Carregue um dos exemplos acima para testar <strong>Compilar</strong> e <strong>Executar consulta</strong>.
-          </p>
+          <p>As saídas anteriores foram limpas. Compile ou consulte o programa atual.</p>
         </div>
         <button id="btnRecarregarValido" type="button" class="b lil">Carregar Programa válido</button>
       </div>
@@ -163,7 +156,7 @@
               <button id="btnLimpar" type="button" class="b creme">Limpar saída</button>
             </div>
             <p id="editorAjuda" class="note">
-              Editar o código limpa as saídas simuladas e solicita o carregamento de um exemplo.
+              Termine cada fato ou regra com um ponto.
             </p>
           </footer>
         </article>
@@ -185,7 +178,7 @@
 
             <div class="win-body">
               <div class="sim-strip" id="maquinaSimAviso">
-                <span class="tag ouro">SAÍDA SIMULADA</span>
+                <span class="tag ouro">ANÁLISE DO PROGRAMA</span>
                 <span id="maquinaResumo" class="mono">Clique em Compilar para inspecionar tokens, símbolos, árvore ou diagnóstico.</span>
               </div>
 
@@ -277,7 +270,7 @@
                 <button id="btnExecutar" type="button" class="b rosa">Executar consulta</button>
               </div>
               <p id="consultaAjuda" class="note">
-                A resposta exibida no console é simulada e corresponde ao exemplo carregado. Editar a consulta limpa a saída.
+                Use variáveis iniciadas por maiúscula ou sublinhado para buscar valores. Pressione Enter para executar.
               </p>
             </div>
           </article>
@@ -288,7 +281,7 @@
               <div class="win-title">
                 <span class="win-icon" aria-hidden="true">&gt;_</span>
                 <h3 id="tit-console">Console</h3>
-                <span id="consoleTag" class="tag ouro">Saída simulada</span>
+                <span id="consoleTag" class="tag ouro">Pronto</span>
               </div>
               <div class="win-controls" aria-hidden="true">
                 <span>_</span><span>□</span><span>×</span>
@@ -300,7 +293,7 @@
                 id="consoleSaida"
                 class="console-screen mono"
                 role="region"
-                aria-label="Saída simulada do console"
+                aria-label="Saída do console"
                 aria-live="polite"
                 tabindex="0"
               ></div>
@@ -313,7 +306,6 @@
     <section aria-labelledby="sec-estados">
       <div class="rowhead">
         <h2 id="sec-estados">03 / Estados da interface</h2>
-        <span class="mono">Indicador visual do estado atual do protótipo</span>
       </div>
 
       <div class="estados" id="estados">
@@ -322,20 +314,20 @@
           <p>Código e consulta cadastrados prontos no editor. Acione Compilar ou Executar consulta.</p>
         </div>
         <div data-e="compilado" class="card pad verdebg">
-          <span class="mono state-title">Compilado (simulado)</span>
+          <span class="mono state-title">Compilado</span>
           <p>Programa válido analisado com sucesso. Tokens, símbolos e árvore disponíveis na Máquina.</p>
         </div>
         <div data-e="erro-lexico" class="card pad ourobg">
-          <span class="mono state-title">Erro léxico (simulado)</span>
-          <p>Símbolo fora do alfabeto detectado pelo AFD. Diagnóstico léxico exibido na Máquina.</p>
+          <span class="mono state-title">Erro léxico</span>
+          <p>Consulte o diagnóstico na Máquina para localizar caracteres inválidos ou trechos sem fechamento.</p>
         </div>
         <div data-e="erro-sintatico" class="card pad coralbg">
-          <span class="mono state-title">Erro sintático (simulado)</span>
-          <p>Tokens válidos, porém estrutura incompatível com a GLC. Diagnóstico e árvore parcial exibidos.</p>
+          <span class="mono state-title">Erro sintático</span>
+          <p>A Máquina indica onde a estrutura do programa ficou incompleta ou inválida.</p>
         </div>
         <div data-e="editado" class="card pad pessegobg">
           <span class="mono state-title">Editado (saída limpa)</span>
-          <p>Código ou consulta modificados manualmente. Saídas limpas; carregue um exemplo para testar.</p>
+          <p>Compile ou execute uma consulta para gerar novas saídas após editar.</p>
         </div>
       </div>
     </section>
@@ -344,9 +336,8 @@
   <footer>
     <div>
       <b>Tradutor Prolog · Item 4 (Interface Web Retrô)</b><br>
-      <small>Protótipo local em HTML, CSS e JavaScript · Todas as compilações e consultas exibidas são simuladas</small>
+      <small>Interpretador local em JavaScript</small>
     </div>
-    <span class="tag ciano">Abre localmente via index.html</span>
   </footer>
 
   <div class="retro-ribbon bottom" aria-hidden="true"></div>
