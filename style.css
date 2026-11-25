@@ -127,29 +127,6 @@ small,
   border-top: 3px solid var(--preto);
 }
 
-/* Hero simples fixo no topo */
-.hero-top {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: linear-gradient(135deg, var(--rosaC) 0%, var(--papel) 52%, var(--cianoC) 100%);
-  border-bottom: 3px solid var(--preto);
-  box-shadow: 0 4px 0 var(--preto);
-}
-
-.hero-top-inner {
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 14px 20px;
-}
-
-.hero-title {
-  margin: 0;
-  font-size: 32px;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
-
 main {
   max-width: 1240px;
   margin: 0 auto;
@@ -926,10 +903,6 @@ tbody tr.row-err {
     grid-template-columns: 1fr;
   }
 
-  .hero-title {
-    font-size: 26px;
-  }
-
   .editor-shell,
   .code-input {
     min-height: 260px;
@@ -937,14 +910,6 @@ tbody tr.row-err {
 }
 
 @media (max-width: 600px) {
-  .hero-top-inner {
-    padding: 12px 14px;
-  }
-
-  .hero-title {
-    font-size: 23px;
-  }
-
   main {
     padding: 16px 12px 44px;
   }
