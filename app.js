@@ -1,9 +1,13 @@
-/* Controlador da interface do Tradutor Prolog. */
+/* Controlador da interface do Tradutor PROLOG conectado ao backend local. */
 (function () {
   const $ = id => document.getElementById(id);
   const EXEMPLOS = window.EXEMPLOS_PROLOG || {};
 
-  const estado = { exemploId: 'valido', fase: 'carregado', requisicao: 0 };
+  const estado = {
+    exemploId: 'personalizado',
+    requisicao: 0,
+    linhasErro: []
+  };
 
   const abas = Array.from(document.querySelectorAll('.machine-tabs [role="tab"]'));
   const botoesExemplo = Array.from(document.querySelectorAll('.ex-btn'));
@@ -17,44 +21,45 @@
       .replace(/'/g, '&#39;');
   }
 
-  function atualizarLinhas(notaExtra) {
+  function atualizarLinhas() {
     const texto = $('editorCodigo').value;
     const total = Math.max(1, texto.split('\n').length);
-    let numeros = '';
+    const errosNormalizados = [...new Set(
+      estado.linhasErro
+        .filter(n => Number.isInteger(n) && n >= 1)
+        .map(n => Math.min(n, total))
+    )].sort((a, b) => a - b);
+    const erros = new Set(errosNormalizados);
+    const primeiraErro = errosNormalizados.length ? errosNormalizados[0] : -1;
+
+    let gutterHtml = '';
+    let backdropHtml = '';
     for (let i = 1; i <= total; i++) {
-      numeros += i === total ? String(i) : `${i}\n`;
+      const temErro = erros.has(i);
+      const bolinha = i === primeiraErro ? '<span class="err-dot" aria-hidden="true"></span>' : '';
+      gutterHtml += `<div class="gutter-line${temErro ? ' is-err' : ''}">${bolinha}<span>${i}</span></div>`;
+      backdropHtml += `<div class="code-line-bg${temErro ? ' is-err' : ''}"></div>`;
     }
-    $('editorLinhas').textContent = numeros;
-    $('editorMeta').textContent = `${total} ${total === 1 ? 'linha' : 'linhas'} · ${notaExtra}`;
+
+    $('editorLinhas').innerHTML = gutterHtml;
+    $('editorBackdrop').innerHTML = backdropHtml;
+    $('editorLinhas').scrollTop = $('editorCodigo').scrollTop;
+    $('editorBackdrop').scrollTop = $('editorCodigo').scrollTop;
+    $('editorMeta').textContent = `${total} ${total === 1 ? 'linha' : 'linhas'}`;
   }
 
   function setTag(id, texto, classe) {
     const el = $(id);
+    if (!el) return;
     el.textContent = texto;
     el.className = `tag ${classe}`;
   }
 
-  function setPipeline(mapa) {
-    const chaves = [
-      ['programa', 'pipePrograma'],
-      ['lexico', 'pipeLexico'],
-      ['sintatico', 'pipeSintatico'],
-      ['maquina', 'pipeMaquina'],
-      ['console', 'pipeConsole']
-    ];
-    for (const [stage, outId] of chaves) {
-      const cfg = mapa[stage] || { texto: 'Aguardando', classe: '' };
-      const item = document.querySelector(`.pipe-step[data-stage="${stage}"]`);
-      if (item) {
-        item.className = `pipe-step${cfg.classe ? ' ' + cfg.classe : ''}`;
-      }
-      $(outId).textContent = cfg.texto;
-    }
-  }
-
-  function atualizarCardsEstado() {
-    document.querySelectorAll('#estados [data-e]').forEach(card => {
-      card.classList.toggle('atual', card.dataset.e === estado.fase);
+  function marcarBotaoExemplo(id) {
+    botoesExemplo.forEach(btn => {
+      const ativo = btn.dataset.ex === id;
+      btn.classList.toggle('on', ativo);
+      btn.setAttribute('aria-pressed', String(ativo));
     });
   }
 
@@ -62,7 +67,7 @@
     abas.forEach(btn => {
       const ativa = btn.dataset.tab === nomeAba;
       btn.classList.toggle('on', ativa);
-      btn.setAttribute('aria-selected', ativa ? 'true' : 'false');
+      btn.setAttribute('aria-selected', String(ativa));
       btn.tabIndex = ativa ? 0 : -1;
       const painel = $(btn.getAttribute('aria-controls'));
       if (painel) painel.hidden = !ativa;
@@ -76,14 +81,13 @@
       `<pre class="console-lines">${esc(linhas.join('\n'))}</pre>`;
   }
 
-  function renderVazioMaquina() {
+  function renderVazioMaquina(mensagem) {
     $('badgeTokens').textContent = '0';
     $('badgeSimbolos').textContent = '0';
     $('badgeArvore').textContent = '–';
     $('badgeDiag').textContent = '–';
 
-    const bloco = '<div class="panel-empty"><p>Clique em <strong>Compilar</strong> para analisar o programa do editor.</p></div>';
-
+    const bloco = `<div class="panel-empty"><p>${esc(mensagem || 'Aguardando compilação.')}</p></div>`;
     $('panel-tokens').innerHTML = bloco;
     $('panel-simbolos').innerHTML = bloco;
     $('panel-arvore').innerHTML = bloco;
@@ -91,8 +95,15 @@
   }
 
   function renderTokens(tokens) {
-    const classes = { atomo: ['Átomo', 'ok'], atomo_citado: ['Átomo entre aspas', 'ok'], variavel: ['Variável', 'var'],
-      inteiro: ['Inteiro', 'ok'], decimal: ['Decimal', 'ok'], operador: ['Operador', 'op'], delimitador: ['Delimitador', 'delim'] };
+    const classes = {
+      atomo: ['Átomo', 'ok'],
+      atomo_citado: ['Átomo entre aspas', 'ok'],
+      variavel: ['Variável', 'var'],
+      inteiro: ['Inteiro', 'ok'],
+      decimal: ['Decimal', 'ok'],
+      operador: ['Operador', 'op'],
+      delimitador: ['Delimitador', 'delim']
+    };
     const linhas = tokens.map((t, i) => {
       const [classe, cor] = classes[t.classe] || ['Inválido', 'err'];
       return `
@@ -165,6 +176,7 @@
     if (!arvore) {
       $('panel-arvore').innerHTML = `
         <div class="panel-empty">
+          <span class="tag ouro">Indisponível</span>
           <p>Corrija os erros léxicos para gerar a árvore sintática.</p>
         </div>
       `;
@@ -180,39 +192,66 @@
 
   function renderDiagnosticos(diagnosticos, fonte) {
     if (!diagnosticos.length) {
-      $('panel-diagnostico').innerHTML = '<div class="diag-box"><div class="diag-header ok">Programa analisado sem erros.</div></div>';
+      $('panel-diagnostico').innerHTML =
+        '<div class="diag-box"><div class="diag-header ok"><strong>Programa analisado sem erros.</strong></div></div>';
       return;
     }
     const linhas = fonte.split(/\r\n?|\n/);
     $('panel-diagnostico').innerHTML = diagnosticos.map(d => {
       const linha = linhas[d.linha - 1] ?? '';
-      const marcador = [...linha].slice(0, d.coluna - 1).map(c => c === '\t' ? '\t' : ' ').join('');
+      const marcador = [...linha].slice(0, Math.max(0, d.coluna - 1)).map(c => c === '\t' ? '\t' : ' ').join('');
+      const lexico = d.fase === 'léxica';
       return `
       <div class="diag-box">
-        <div class="diag-header ${d.fase === 'léxica' ? 'lex' : 'sin'}">
-          <strong>${esc(d.mensagem)}</strong><span class="mono">${d.linha}:${d.coluna}</span>
+        <div class="diag-header ${lexico ? 'lex' : 'sin'}">
+          <strong>${esc(d.mensagem)}</strong>
+          <span class="tag ${lexico ? 'ouro' : 'coral'}">${d.linha}:${d.coluna}</span>
         </div>
-        <pre class="diag-snippet">${esc(`${linha}\n${marcador}^`)}</pre>
+        <div class="diag-grid">
+          <div class="diag-kv"><span>Etapa</span><strong>${lexico ? 'Análise Léxica' : 'Análise Sintática'}</strong></div>
+          <div class="diag-kv"><span>Localização</span><strong>Linha ${d.linha}, Coluna ${d.coluna}</strong></div>
+          <div class="diag-kv"><span>Elemento</span><strong>${esc(d.lexema || 'fim do arquivo')}</strong></div>
+        </div>
+        <pre class="diag-snippet">${esc(`${d.linha} | ${linha}\n${' '.repeat(String(d.linha).length + 3)}${marcador}^`)}</pre>
       </div>`;
     }).join('');
   }
 
+  function ativarPersonalizado(limparCampos, focarEditor) {
+    estado.exemploId = 'personalizado';
+    estado.linhasErro = [];
+
+    if (limparCampos) {
+      $('editorCodigo').value = '';
+      $('inputConsulta').value = '';
+    }
+
+    $('editorArquivo').textContent = 'personalizado.pl';
+    marcarBotaoExemplo('personalizado');
+    setTag('editorModo', 'Personalizado', 'lil');
+    limparSaida('Escreva um código Prolog no editor ou escolha um exemplo.', 'Modo personalizado ativo.');
+    selecionarAba('tokens', false);
+
+    if (focarEditor) $('editorCodigo').focus();
+  }
+
   function carregarExemplo(id) {
+    if (id === 'personalizado') {
+      ativarPersonalizado(true, true);
+      return;
+    }
+
     const ex = EXEMPLOS[id];
     if (!ex) return;
+
     estado.exemploId = id;
+    estado.linhasErro = [];
     $('editorCodigo').value = ex.codigo;
     $('inputConsulta').value = ex.consulta;
     $('editorArquivo').textContent = ex.arquivo;
-    $('exemploDesc').textContent = ex.descricao;
-    $('exemploAtivoInfo').textContent = `Exemplo ativo: ${ex.titulo}`;
-    $('avisoEdicao').hidden = true;
-    botoesExemplo.forEach(btn => {
-      const ativo = btn.dataset.ex === id;
-      btn.classList.toggle('on', ativo);
-      btn.setAttribute('aria-pressed', String(ativo));
-    });
-    limparSaida();
+    marcarBotaoExemplo(id);
+    setTag('editorModo', 'Exemplo', 'verdeC');
+    limparSaida('Clique em Compilar para analisar o programa.', `${ex.arquivo} carregado.`);
     selecionarAba('tokens', false);
   }
 
@@ -229,8 +268,10 @@
       return requisicao === estado.requisicao ? resultado : null;
     } catch (falha) {
       if (requisicao !== estado.requisicao) return null;
-      const mensagem = falha instanceof TypeError ? 'Inicie o servidor com node server.js e abra http://127.0.0.1:3000.' : falha.message;
-      setTag('consoleTag', 'Erro de comunicação', 'coral');
+      const mensagem = falha instanceof TypeError
+        ? 'Inicie o servidor com node server.js e abra http://127.0.0.1:3000.'
+        : falha.message;
+      setTag('consoleTag', 'Erro', 'coral');
       renderConsole('ERRO NA REQUISIÇÃO', 'err', [mensagem]);
       return null;
     }
@@ -238,50 +279,73 @@
 
   async function compilar() {
     const codigo = $('editorCodigo').value;
+    if (!codigo.trim()) {
+      estado.linhasErro = [];
+      atualizarLinhas();
+      setTag('maquinaTag', 'Editor vazio', 'pessego');
+      setTag('consoleTag', 'Aviso', 'pessego');
+      renderVazioMaquina('Escreva um código Prolog no editor antes de compilar.');
+      renderConsole('AVISO', 'edit', ['Escreva um código Prolog no editor antes de compilar.']);
+      return;
+    }
+
     const resultado = await enviar('/api/compilar', { codigo });
     if (!resultado) return;
+
     const { tokens, simbolos, arvore, diagnosticos, clausulas } = resultado;
-    const erro = diagnosticos[0], lexico = erro?.fase === 'léxica';
+    const erro = diagnosticos[0];
+    const lexico = erro?.fase === 'léxica';
     const status = erro ? (lexico ? 'Erro léxico' : 'Erro sintático') : 'Compilado';
-    estado.fase = erro ? (lexico ? 'erro-lexico' : 'erro-sintatico') : 'compilado';
+
+    estado.linhasErro = diagnosticos.map(d => d.linha);
+    atualizarLinhas();
 
     renderTokens(tokens);
     renderSimbolos(simbolos);
     renderArvore(arvore);
     renderDiagnosticos(diagnosticos, codigo);
-    $('badgeTokens').textContent = tokens.length;
-    $('badgeSimbolos').textContent = simbolos.length;
-    $('badgeArvore').textContent = arvore ? (erro ? 'Parcial' : '✓') : '–';
-    $('badgeDiag').textContent = diagnosticos.length;
-    setTag('statusGlobal', status, erro ? 'coral' : 'verde');
-    setTag('maquinaTag', status, erro ? 'coral' : 'verde');
-    setTag('consoleTag', erro ? 'Bloqueada' : 'Pronto', erro ? 'coral' : 'verde');
-    $('maquinaResumo').textContent = erro ? 'Corrija o código no editor.' : `${clausulas} cláusula(s) disponível(is) para consulta.`;
 
-    renderConsole(status.toUpperCase(), erro ? 'err' : 'ok', erro
-      ? diagnosticos.map(d => `${d.linha}:${d.coluna} · ${d.mensagem}`)
-      : ['Clique em Executar consulta para consultar a base.']);
-    setPipeline({
-      programa: { texto: 'Analisado', classe: 'ok' },
-      lexico: { texto: lexico ? 'Erro léxico' : `${tokens.length} tokens`, classe: lexico ? 'erro' : 'ok' },
-      sintatico: { texto: lexico ? 'Aguardando' : erro ? 'Erro sintático' : 'Válido', classe: lexico ? '' : erro ? 'erro' : 'ok' },
-      maquina: { texto: erro ? 'Bloqueada' : `${clausulas} cláusulas`, classe: erro ? 'erro' : 'ok' },
-      console: { texto: erro ? 'Bloqueado' : 'Pronto', classe: erro ? 'erro' : 'ativo' }
-    });
+    $('badgeTokens').textContent = String(tokens.length);
+    $('badgeSimbolos').textContent = String(simbolos.length);
+    $('badgeArvore').textContent = arvore ? (erro ? 'Parcial' : 'OK') : '✖';
+    $('badgeDiag').textContent = String(diagnosticos.length);
+
+    setTag('maquinaTag', status, erro ? (lexico ? 'ouro' : 'coral') : 'verde');
+    setTag('consoleTag', erro ? 'Erro' : 'OK', erro ? 'coral' : 'verde');
+
+    renderConsole(
+      status.toUpperCase(),
+      erro ? 'err' : 'ok',
+      erro
+        ? diagnosticos.map(d => `${d.linha}:${d.coluna} · ${d.mensagem}`)
+        : [`${$('editorArquivo').textContent}: ${tokens.length} tokens, ${simbolos.length} símbolos, ${clausulas} cláusula(s).`]
+    );
     selecionarAba(erro ? 'diagnostico' : 'tokens', false);
-    atualizarLinhas(erro ? status : 'sem erros');
-    atualizarCardsEstado();
   }
 
   async function executarConsulta() {
-    const codigo = $('editorCodigo').value, consulta = $('inputConsulta').value;
+    const codigo = $('editorCodigo').value;
+    const consulta = $('inputConsulta').value;
+    if (!consulta.trim()) {
+      setTag('consoleTag', 'Aviso', 'pessego');
+      renderConsole('AVISO', 'edit', ['Informe uma consulta antes de executar.']);
+      return;
+    }
+
     const resultado = await enviar('/api/consultar', { codigo, consulta });
     if (!resultado) return;
+
     const linhas = [`?- ${consulta.trim().replace(/^\?-\s*/, '')}`, ''];
     const { diagnosticos, origem, solucoes, saida, erro, limitada } = resultado;
     if (saida) linhas.push(saida.replace(/\n$/, ''));
     if (diagnosticos) {
-      for (const d of diagnosticos) linhas.push(`Erro no ${origem === 'programa' ? 'programa' : 'texto da consulta'} (${d.linha}:${d.coluna}). ${d.mensagem}`);
+      if (origem === 'programa') {
+        estado.linhasErro = diagnosticos.map(d => d.linha);
+        atualizarLinhas();
+      }
+      for (const d of diagnosticos) {
+        linhas.push(`Erro (${d.linha}:${d.coluna}): ${d.mensagem}`);
+      }
     } else {
       const respostas = solucoes.map(s => Object.entries(s).map(([nome, valor]) => `${nome} = ${valor}`).join(', ') || 'true');
       if (respostas.length) linhas.push(`${respostas.join(' ;\n')}.`);
@@ -289,38 +353,30 @@
       if (limitada) linhas.push('Exibindo as primeiras 100 soluções.');
       if (erro) linhas.push(erro);
     }
+
     const falhou = Boolean(erro || diagnosticos);
-    renderConsole(falhou ? 'CONSULTA INTERROMPIDA' : 'RESULTADO DA CONSULTA', falhou ? 'err' : 'ok', linhas);
-    setTag('consoleTag', falhou ? 'Consulta interrompida' : 'Consulta concluída', falhou ? 'coral' : 'verde');
-    $('pipeConsole').textContent = falhou ? 'Interrompida' : `${solucoes.length} solução(ões)`;
-    $('pipeConsole').parentElement.className = `pipe-step ${falhou ? 'erro' : 'ok'}`;
+    renderConsole(falhou ? 'CONSULTA INTERROMPIDA' : 'CONSULTA', falhou ? 'err' : 'ok', linhas);
+    setTag('consoleTag', falhou ? 'Erro' : 'OK', falhou ? 'coral' : 'verde');
   }
 
-  function limparSaida() {
+  function limparSaida(msgMaquina, msgConsole) {
     estado.requisicao++;
-    const exemplo = estado.exemploId !== null;
-    estado.fase = exemplo ? 'carregado' : 'editado';
-    setTag('statusGlobal', exemplo ? 'Exemplo carregado' : 'Editado', exemplo ? 'lil' : 'pessego');
-    setTag('editorModo', exemplo ? 'Exemplo cadastrado' : 'Editado manualmente', exemplo ? 'verdeC' : 'pessego');
-    setTag('maquinaTag', 'Aguardando compilação', 'creme');
-    setTag('consoleTag', 'Pronto', 'ouro');
-    $('maquinaResumo').textContent = 'Clique em Compilar para analisar o código atual.';
-    renderVazioMaquina();
-    renderConsole('PRONTO', 'edit', ['Clique em Executar consulta para consultar o programa do editor.']);
-    setPipeline({ programa: { texto: exemplo ? 'Carregado' : 'Editado', classe: exemplo ? 'ativo' : 'editado' } });
-    atualizarLinhas('aguardando compilação');
-    atualizarCardsEstado();
+    estado.linhasErro = [];
+    atualizarLinhas();
+    setTag('maquinaTag', 'Aguardando', 'creme');
+    setTag('consoleTag', 'Pronto', 'creme');
+    renderVazioMaquina(msgMaquina || 'Saída limpa.');
+    renderConsole('PRONTO', 'edit', [msgConsole || 'Saída limpa.']);
   }
 
   function aoEditar() {
-    estado.exemploId = null;
-    botoesExemplo.forEach(btn => {
-      btn.classList.remove('on');
-      btn.setAttribute('aria-pressed', 'false');
-    });
-    $('exemploAtivoInfo').textContent = 'Conteúdo editado';
-    $('avisoEdicao').hidden = false;
-    limparSaida();
+    if (estado.exemploId !== 'personalizado') {
+      ativarPersonalizado(false, false);
+    } else if (estado.linhasErro.length) {
+      limparSaida('Aguardando compilação.', 'Pronto.');
+    } else {
+      atualizarLinhas();
+    }
   }
 
   /* Eventos dos controles */
@@ -329,19 +385,16 @@
   });
 
   $('btnCompilar').addEventListener('click', compilar);
-  $('topCompilar').addEventListener('click', compilar);
   $('btnExecutar').addEventListener('click', executarConsulta);
-  $('topExecutar').addEventListener('click', executarConsulta);
-  $('btnLimpar').addEventListener('click', limparSaida);
-  $('topLimpar').addEventListener('click', limparSaida);
-  $('btnRecarregarValido').addEventListener('click', () => carregarExemplo('valido'));
+  $('btnLimpar').addEventListener('click', () => limparSaida('Saída limpa.', 'Saída limpa.'));
 
   $('editorCodigo').addEventListener('input', aoEditar);
   $('editorCodigo').addEventListener('scroll', () => {
-    $('editorLinhas').scrollTop = $('editorCodigo').scrollTop;
+    const top = $('editorCodigo').scrollTop;
+    $('editorLinhas').scrollTop = top;
+    $('editorBackdrop').scrollTop = top;
   });
 
-  $('inputConsulta').addEventListener('input', aoEditar);
   $('inputConsulta').addEventListener('keydown', e => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -365,6 +418,6 @@
     });
   });
 
-  /* Estado inicial */
-  carregarExemplo('valido');
+  /* Estado inicial: Personalizado pronto para escrever ou escolher um exemplo */
+  ativarPersonalizado(true, false);
 })();

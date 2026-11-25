@@ -127,68 +127,14 @@ small,
   border-top: 3px solid var(--preto);
 }
 
-/* Barra superior fixa (estilo Trabalho de AD + barra de navegador retrô) */
-.top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 14px;
-  padding: 10px 24px;
-  background: var(--papel);
-  border-bottom: 3px solid var(--preto);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  flex-wrap: wrap;
-}
-
-.top-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.win-glyph {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border: 3px solid var(--preto);
-  border-radius: 6px;
-  background: var(--amarelo);
-  box-shadow: 2px 2px 0 var(--preto);
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.address-bar {
-  background: var(--off);
-  border: 3px solid var(--preto);
-  border-radius: 999px;
-  padding: 5px 14px;
-  box-shadow: 2px 2px 0 var(--preto);
-  font-weight: 700;
-}
-
-.top-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
 main {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 24px 20px 56px;
+  padding: 20px 20px 56px;
 }
 
-h1 {
-  font-size: 44px;
-  line-height: 1.05;
-  margin: 4px 0 8px;
-  letter-spacing: -0.02em;
+main > section:first-child h2 {
+  margin-top: 4px;
 }
 
 h2 {
@@ -249,42 +195,6 @@ h3 {
   padding: 18px;
 }
 
-/* Hero (Trabalho de AD) */
-.hero {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 18px;
-  background: linear-gradient(135deg, var(--rosaC) 0%, var(--papel) 52%, var(--cianoC) 100%);
-  border: 3px solid var(--preto);
-  border-radius: 10px;
-  box-shadow: var(--sh);
-  padding: 20px 22px;
-}
-
-.hero-copy {
-  max-width: 720px;
-}
-
-.eyebrow {
-  margin: 0;
-  font-weight: 700;
-  color: var(--roxoP);
-}
-
-.lead {
-  margin: 0;
-  color: #24232B;
-}
-
-.hero-r {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
 /* Tags e badges pastel */
 .tag {
   display: inline-flex;
@@ -319,19 +229,9 @@ h3 {
   flex-wrap: wrap;
 }
 
-/* Deck de exemplos e pipeline Aula 5 */
-.control-deck {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.2fr);
-  gap: 20px;
-  align-items: start;
+/* Carregamento de exemplos */
+.example-picker {
   background: var(--papel);
-}
-
-.picker-label {
-  display: block;
-  font-weight: 700;
-  margin-bottom: 8px;
 }
 
 .seg {
@@ -366,6 +266,10 @@ h3 {
   background: var(--roxo);
 }
 
+.seg button[data-ex="personalizado"].on {
+  background: var(--lilas);
+}
+
 .seg button[data-ex="valido"].on {
   background: var(--verde);
 }
@@ -386,66 +290,10 @@ h3 {
   flex-shrink: 0;
 }
 
+.ex-dot.lil { background: var(--roxo); }
 .ex-dot.verde { background: var(--verde); }
 .ex-dot.ouro { background: var(--amarelo); }
 .ex-dot.coral { background: var(--coral); }
-
-/* Pipeline segmentado estilo barra retrô */
-.pipeline {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.pipe-step {
-  flex: 1 1 88px;
-  border: 3px solid var(--preto);
-  border-radius: 6px;
-  padding: 7px 8px;
-  background: var(--off);
-  box-shadow: 2px 2px 0 var(--preto);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.pipe-step strong {
-  font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.pipe-step.ok { background: var(--verdeC); }
-.pipe-step.ativo { background: var(--amareloC); }
-.pipe-step.erro { background: var(--coralC); }
-.pipe-step.editado { background: var(--pessegoC); }
-
-.pipe-arrow {
-  font: 700 15px 'Space Mono', monospace;
-  user-select: none;
-}
-
-/* Banner de orientação ao editar */
-.edit-banner {
-  margin-top: 14px;
-  background: var(--pessegoC);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.edit-banner-body p {
-  margin: 8px 0 0;
-  max-width: 780px;
-}
 
 /* Layout principal Aula 5: Editor à esquerda; Máquina, Consulta e Console à direita */
 .ide-grid {
@@ -552,35 +400,86 @@ h3 {
   background: var(--off);
 }
 
-/* Editor Prolog com numeração de linhas */
+/* Editor Prolog com numeração de linhas e destaque de erro */
 .editor-shell {
   display: grid;
-  grid-template-columns: 46px minmax(0, 1fr);
+  grid-template-columns: 54px minmax(0, 1fr);
   background: var(--papel);
   min-height: 390px;
 }
 
 .gutter {
-  padding: 14px 8px;
+  padding: 14px 0;
   background: var(--creme);
   border-right: 3px solid var(--preto);
-  text-align: right;
   color: var(--cinza);
   font-size: 13px;
   line-height: 23px;
   user-select: none;
   overflow: hidden;
-  white-space: pre;
+}
+
+.gutter-line {
+  height: 23px;
+  line-height: 23px;
+  padding: 0 8px 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.gutter-line.is-err {
+  background: var(--coralC);
+  color: var(--verm);
+  font-weight: 700;
+}
+
+.err-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--verm);
+  border: 2px solid var(--preto);
+  flex-shrink: 0;
+}
+
+.editor-code-wrap {
+  position: relative;
+  min-width: 0;
+  background: var(--papel);
+  overflow: hidden;
+}
+
+.code-backdrop {
+  position: absolute;
+  inset: 0;
+  padding: 14px 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.code-line-bg {
+  height: 23px;
+  width: 100%;
+}
+
+.code-line-bg.is-err {
+  background: var(--coralC);
 }
 
 .code-input {
+  position: relative;
+  z-index: 2;
+  display: block;
   width: 100%;
   min-height: 390px;
   margin: 0;
   padding: 14px;
   border: 0;
   resize: vertical;
-  background: var(--papel);
+  background: transparent;
   color: var(--preto);
   font-size: 14px;
   line-height: 23px;
@@ -599,23 +498,18 @@ h3 {
 
 .action-group {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
 }
 
-/* Máquina: faixa simulada + abas + painéis */
-.sim-strip {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  padding: 8px 10px;
-  margin-bottom: 12px;
-  border: 3px solid var(--preto);
-  border-radius: 6px;
-  background: var(--amareloC);
+.editor-actions .action-group .b {
+  flex: 1 1 0;
+  padding: 12px 18px;
+  font-size: 14px;
+  text-align: center;
 }
 
+/* Máquina: abas + painéis */
 .tabs {
   display: flex;
   gap: 8px;
@@ -788,16 +682,17 @@ tbody tr.row-err {
 
 /* Diagnóstico e estados vazios */
 .panel-empty {
-  padding: 18px;
+  padding: 16px;
   background: var(--off);
 }
 
-.panel-empty.edit-state {
-  background: var(--pessegoC);
+.panel-empty p {
+  margin: 0;
+  font-size: 13px;
 }
 
-.panel-empty p {
-  margin: 8px 0 0;
+.panel-empty .tag + p {
+  margin-top: 8px;
 }
 
 .diag-box {
@@ -857,22 +752,7 @@ tbody tr.row-err {
   overflow-x: auto;
 }
 
-.diag-hint {
-  margin: 0;
-  padding: 10px 12px;
-  border: 2px solid var(--preto);
-  border-radius: 6px;
-  background: var(--cianoC);
-  font-size: 13px;
-}
-
 /* Consulta */
-.consulta-label {
-  display: block;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
 .consulta-row {
   display: flex;
   gap: 10px;
@@ -963,79 +843,64 @@ tbody tr.row-err {
   font-family: inherit;
 }
 
-/* Estados da interface (inspirado na seção 05 do Trabalho de AD) */
-.estados {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-}
-
-.estados .card {
-  opacity: 0.56;
-  transition: opacity 0.15s ease;
-}
-
-.estados .card.atual {
-  opacity: 1;
-  outline: 4px solid var(--preto);
-  outline-offset: 3px;
-}
-
-.state-title {
-  display: inline-block;
-  font-weight: 700;
-  margin-bottom: 6px;
-  padding: 2px 8px;
-  border: 2px solid var(--preto);
-  border-radius: 999px;
-  background: var(--papel);
-}
-
-.estados p {
-  margin: 4px 0 0;
-  font-size: 13px;
-}
-
-.lilbg { background: var(--lilas); }
-.verdebg { background: var(--verdeC); }
-.ourobg { background: var(--amareloC); }
-.coralbg { background: var(--coralC); }
-.pessegobg { background: var(--pessegoC); }
-
-/* Rodapé (Trabalho de AD) */
-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 20px 24px;
-  border-top: 3px solid var(--preto);
-  max-width: 1240px;
-  margin: 0 auto;
-}
-
 :focus-visible {
   outline: 3px solid var(--roxoP);
   outline-offset: 2px;
 }
 
+/* Scrollbars personalizadas no estilo Web Retrô */
+*::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--creme);
+  border-left: 2px solid var(--preto);
+}
+
+*::-webkit-scrollbar-track:horizontal {
+  border-left: 0;
+  border-top: 2px solid var(--preto);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--roxo);
+  border: 2px solid var(--preto);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--amarelo);
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: var(--rosa);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--amarelo);
+  border-top: 2px solid var(--preto);
+  border-left: 2px solid var(--preto);
+}
+
+.win-editor *::-webkit-scrollbar-thumb { background: var(--amarelo); }
+.win-editor *::-webkit-scrollbar-thumb:hover { background: var(--pessego); }
+.win-maquina *::-webkit-scrollbar-thumb { background: var(--roxo); }
+.win-maquina *::-webkit-scrollbar-thumb:hover { background: var(--rosa); }
+.win-console *::-webkit-scrollbar-thumb { background: var(--ciano); }
+.win-console *::-webkit-scrollbar-thumb:hover { background: var(--verde); }
+
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--roxo) var(--creme);
+  }
+}
+
 @media (max-width: 900px) {
-  .control-deck,
   .ide-grid {
     grid-template-columns: 1fr;
-  }
-
-  .hero {
-    flex-direction: column;
-  }
-
-  .hero-r {
-    align-items: flex-start;
-  }
-
-  h1 {
-    font-size: 34px;
   }
 
   .editor-shell,
@@ -1044,47 +909,12 @@ footer {
   }
 }
 
-@media (max-width: 720px) {
-  .top {
-    position: static;
-    padding: 10px 14px;
-  }
-}
-
 @media (max-width: 600px) {
   main {
     padding: 16px 12px 44px;
   }
 
-  .top-actions {
-    width: 100%;
-  }
-
-  .top-actions .b {
-    flex: 1 1 auto;
-    text-align: center;
-  }
-
   .consulta-row {
     flex-direction: column;
-  }
-
-  .pipe-arrow {
-    display: none;
-  }
-
-  .pipeline {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .address-bar {
-    font-size: 11px;
-    padding: 4px 10px;
-  }
-
-  footer {
-    padding: 16px 12px;
   }
 }

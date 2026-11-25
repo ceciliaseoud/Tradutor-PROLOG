@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tradutor Prolog</title>
+  <title>Tradutor PROLOG</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -14,106 +14,37 @@
 
   <div class="retro-ribbon" aria-hidden="true"></div>
 
-  <header class="top" aria-label="Barra principal do tradutor">
-    <div class="top-brand">
-      <span class="win-glyph" aria-hidden="true">✦</span>
-      <span class="address-bar mono" aria-label="Endereço simbólico do ambiente">prolog://tradutor.local/item-4</span>
-      <span class="tag ciano">Interpretador local</span>
-    </div>
-
-    <div class="top-actions">
-      <button id="topCompilar" type="button" class="b verde">Compilar</button>
-      <button id="topExecutar" type="button" class="b rosa">Executar consulta</button>
-      <button id="topLimpar" type="button" class="b creme">Limpar saída</button>
-    </div>
-  </header>
-
   <main>
-    <section class="hero" aria-labelledby="titulo-principal">
-      <div class="hero-copy">
-        <p class="mono eyebrow">Item 4 · Interface do Tradutor</p>
-        <h1 id="titulo-principal">Tradutor Prolog</h1>
-        <p class="lead">
-          Escreva um programa Prolog, inspecione tokens, símbolos e árvore sintática, e execute consultas no console.
-        </p>
-      </div>
-      <div class="hero-r">
-        <span id="statusGlobal" class="tag lil" aria-live="polite">Exemplo carregado</span>
-        <span id="exemploAtivoInfo" class="mono">Exemplo ativo: Programa válido</span>
-      </div>
-    </section>
-
     <section aria-labelledby="sec-exemplos">
       <div class="rowhead">
-        <h2 id="sec-exemplos">01 / Exemplos cadastrados e fluxo da máquina</h2>
+        <h2 id="sec-exemplos">01 / Exemplos</h2>
       </div>
 
-      <div class="card pad control-deck">
-        <div class="example-picker">
-          <span class="mono picker-label">Carregar exemplo para testar os controles</span>
-          <div class="seg example-seg" role="group" aria-label="Exemplos cadastrados de Prolog">
-            <button type="button" class="ex-btn on" data-ex="valido" aria-pressed="true">
-              <span class="ex-dot verde" aria-hidden="true"></span>
-              Programa válido
-            </button>
-            <button type="button" class="ex-btn" data-ex="erro-lexico" aria-pressed="false">
-              <span class="ex-dot ouro" aria-hidden="true"></span>
-              Erro léxico
-            </button>
-            <button type="button" class="ex-btn" data-ex="erro-sintatico" aria-pressed="false">
-              <span class="ex-dot coral" aria-hidden="true"></span>
-              Erro sintático
-            </button>
-          </div>
-          <p id="exemploDesc" class="note">
-            Base genealógica com fatos, uma regra e uma consulta.
-          </p>
+      <div class="card pad example-picker">
+        <div class="seg example-seg" role="group" aria-label="Modo do editor e exemplos de Prolog">
+          <button type="button" class="ex-btn on" data-ex="personalizado" aria-pressed="true">
+            <span class="ex-dot lil" aria-hidden="true"></span>
+            Personalizado
+          </button>
+          <button type="button" class="ex-btn" data-ex="valido" aria-pressed="false">
+            <span class="ex-dot verde" aria-hidden="true"></span>
+            Programa válido
+          </button>
+          <button type="button" class="ex-btn" data-ex="erro-lexico" aria-pressed="false">
+            <span class="ex-dot ouro" aria-hidden="true"></span>
+            Erro léxico
+          </button>
+          <button type="button" class="ex-btn" data-ex="erro-sintatico" aria-pressed="false">
+            <span class="ex-dot coral" aria-hidden="true"></span>
+            Erro sintático
+          </button>
         </div>
-
-        <div class="pipeline-box" aria-label="Fluxo conceitual do compilador conforme Aula 5">
-          <span class="mono picker-label">Fluxo Aula 5: Programa → Máquina ← Consulta → Console</span>
-          <ol class="pipeline" id="pipeline">
-            <li class="pipe-step" data-stage="programa">
-              <span class="mono">1. Programa</span>
-              <strong id="pipePrograma">Carregado</strong>
-            </li>
-            <li class="pipe-arrow" aria-hidden="true">→</li>
-            <li class="pipe-step" data-stage="lexico">
-              <span class="mono">2. Léxico</span>
-              <strong id="pipeLexico">Aguardando</strong>
-            </li>
-            <li class="pipe-arrow" aria-hidden="true">→</li>
-            <li class="pipe-step" data-stage="sintatico">
-              <span class="mono">3. Sintático</span>
-              <strong id="pipeSintatico">Aguardando</strong>
-            </li>
-            <li class="pipe-arrow" aria-hidden="true">→</li>
-            <li class="pipe-step" data-stage="maquina">
-              <span class="mono">4. Máquina</span>
-              <strong id="pipeMaquina">Aguardando</strong>
-            </li>
-            <li class="pipe-arrow" aria-hidden="true">→</li>
-            <li class="pipe-step" data-stage="console">
-              <span class="mono">5. Console</span>
-              <strong id="pipeConsole">Aguardando</strong>
-            </li>
-          </ol>
-        </div>
-      </div>
-
-      <div id="avisoEdicao" class="card pad edit-banner" role="status" aria-live="polite" hidden>
-        <div class="edit-banner-body">
-          <span class="tag pessego">Saídas limpas · Edição detectada</span>
-          <p>As saídas anteriores foram limpas. Compile ou consulte o programa atual.</p>
-        </div>
-        <button id="btnRecarregarValido" type="button" class="b lil">Carregar Programa válido</button>
       </div>
     </section>
 
     <section id="ide" aria-labelledby="sec-ide">
       <div class="rowhead">
-        <h2 id="sec-ide">02 / Ambiente de Programação (IDE)</h2>
-        <span class="mono">Esquerda: Editor Prolog · Direita: Máquina, Consulta e Console</span>
+        <h2 id="sec-ide">02 / Ambiente de Programação</h2>
       </div>
 
       <div class="ide-grid">
@@ -123,7 +54,7 @@
             <div class="win-title">
               <span class="win-icon" aria-hidden="true">✎</span>
               <h3 id="tit-editor">Editor Prolog</h3>
-              <span class="win-file mono" id="editorArquivo">genealogia.pl</span>
+              <span class="win-file mono" id="editorArquivo">personalizado.pl</span>
             </div>
             <div class="win-controls" aria-hidden="true">
               <span>_</span><span>□</span><span>×</span>
@@ -131,23 +62,26 @@
           </header>
 
           <div class="win-subbar">
-            <span id="editorMeta" class="mono">10 linhas · 0 erros marcados</span>
-            <span id="editorModo" class="tag verdeC">Exemplo cadastrado</span>
+            <span id="editorMeta" class="mono">1 linha</span>
+            <span id="editorModo" class="tag lil">Personalizado</span>
           </div>
 
           <div class="editor-shell">
             <label class="sr-only" for="editorCodigo">Código fonte em Prolog</label>
-            <div class="gutter mono" id="editorLinhas" aria-hidden="true">1</div>
-            <textarea
-              id="editorCodigo"
-              class="code-input mono"
-              spellcheck="false"
-              autocomplete="off"
-              autocorrect="off"
-              autocapitalize="off"
-              rows="16"
-              aria-describedby="editorAjuda"
-            ></textarea>
+            <div class="gutter mono" id="editorLinhas" aria-hidden="true"></div>
+            <div class="editor-code-wrap">
+              <div class="code-backdrop" id="editorBackdrop" aria-hidden="true"></div>
+              <textarea
+                id="editorCodigo"
+                class="code-input mono"
+                spellcheck="false"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                rows="16"
+                placeholder="% Escreva seu código Prolog aqui..."
+              ></textarea>
+            </div>
           </div>
 
           <footer class="win-footer editor-actions">
@@ -155,9 +89,6 @@
               <button id="btnCompilar" type="button" class="b verde">Compilar</button>
               <button id="btnLimpar" type="button" class="b creme">Limpar saída</button>
             </div>
-            <p id="editorAjuda" class="note">
-              Termine cada fato ou regra com um ponto.
-            </p>
           </footer>
         </article>
 
@@ -169,7 +100,7 @@
               <div class="win-title">
                 <span class="win-icon" aria-hidden="true">⚙</span>
                 <h3 id="tit-maquina">Máquina</h3>
-                <span id="maquinaTag" class="tag creme">Aguardando compilação</span>
+                <span id="maquinaTag" class="tag creme">Aguardando</span>
               </div>
               <div class="win-controls" aria-hidden="true">
                 <span>_</span><span>□</span><span>×</span>
@@ -177,11 +108,6 @@
             </header>
 
             <div class="win-body">
-              <div class="sim-strip" id="maquinaSimAviso">
-                <span class="tag ouro">ANÁLISE DO PROGRAMA</span>
-                <span id="maquinaResumo" class="mono">Clique em Compilar para inspecionar tokens, símbolos, árvore ou diagnóstico.</span>
-              </div>
-
               <div class="tabs machine-tabs" role="tablist" aria-label="Visualizações da Máquina">
                 <button
                   type="button"
@@ -245,7 +171,6 @@
               <div class="win-title">
                 <span class="win-icon" aria-hidden="true">?</span>
                 <h3 id="tit-consulta">Consulta</h3>
-                <span class="win-file mono">Dados → Máquina</span>
               </div>
               <div class="win-controls" aria-hidden="true">
                 <span>_</span><span>□</span><span>×</span>
@@ -253,7 +178,7 @@
             </header>
 
             <div class="win-body consulta-body">
-              <label for="inputConsulta" class="mono consulta-label">Objetivo Prolog (entrada de dados para a Máquina)</label>
+              <label for="inputConsulta" class="sr-only">Consulta Prolog</label>
               <div class="consulta-row">
                 <div class="query-field">
                   <span class="query-prompt mono" aria-hidden="true">?-</span>
@@ -263,15 +188,11 @@
                     class="mono"
                     spellcheck="false"
                     autocomplete="off"
-                    aria-describedby="consultaAjuda"
                     placeholder="Ex.: avo(joao, Neto)."
                   >
                 </div>
                 <button id="btnExecutar" type="button" class="b rosa">Executar consulta</button>
               </div>
-              <p id="consultaAjuda" class="note">
-                Use variáveis iniciadas por maiúscula ou sublinhado para buscar valores. Pressione Enter para executar.
-              </p>
             </div>
           </article>
 
@@ -281,7 +202,7 @@
               <div class="win-title">
                 <span class="win-icon" aria-hidden="true">&gt;_</span>
                 <h3 id="tit-console">Console</h3>
-                <span id="consoleTag" class="tag ouro">Pronto</span>
+                <span id="consoleTag" class="tag creme">Pronto</span>
               </div>
               <div class="win-controls" aria-hidden="true">
                 <span>_</span><span>□</span><span>×</span>
@@ -302,43 +223,7 @@
         </div>
       </div>
     </section>
-
-    <section aria-labelledby="sec-estados">
-      <div class="rowhead">
-        <h2 id="sec-estados">03 / Estados da interface</h2>
-      </div>
-
-      <div class="estados" id="estados">
-        <div data-e="carregado" class="card pad lilbg">
-          <span class="mono state-title">Exemplo carregado</span>
-          <p>Código e consulta cadastrados prontos no editor. Acione Compilar ou Executar consulta.</p>
-        </div>
-        <div data-e="compilado" class="card pad verdebg">
-          <span class="mono state-title">Compilado</span>
-          <p>Programa válido analisado com sucesso. Tokens, símbolos e árvore disponíveis na Máquina.</p>
-        </div>
-        <div data-e="erro-lexico" class="card pad ourobg">
-          <span class="mono state-title">Erro léxico</span>
-          <p>Consulte o diagnóstico na Máquina para localizar caracteres inválidos ou trechos sem fechamento.</p>
-        </div>
-        <div data-e="erro-sintatico" class="card pad coralbg">
-          <span class="mono state-title">Erro sintático</span>
-          <p>A Máquina indica onde a estrutura do programa ficou incompleta ou inválida.</p>
-        </div>
-        <div data-e="editado" class="card pad pessegobg">
-          <span class="mono state-title">Editado (saída limpa)</span>
-          <p>Compile ou execute uma consulta para gerar novas saídas após editar.</p>
-        </div>
-      </div>
-    </section>
   </main>
-
-  <footer>
-    <div>
-      <b>Tradutor Prolog · Item 4 (Interface Web Retrô)</b><br>
-      <small>Interpretador local em JavaScript</small>
-    </div>
-  </footer>
 
   <div class="retro-ribbon bottom" aria-hidden="true"></div>
 
