@@ -423,35 +423,86 @@ h3 {
   background: var(--off);
 }
 
-/* Editor Prolog com numeração de linhas */
+/* Editor Prolog com numeração de linhas e destaque de erro */
 .editor-shell {
   display: grid;
-  grid-template-columns: 46px minmax(0, 1fr);
+  grid-template-columns: 54px minmax(0, 1fr);
   background: var(--papel);
   min-height: 390px;
 }
 
 .gutter {
-  padding: 14px 8px;
+  padding: 14px 0;
   background: var(--creme);
   border-right: 3px solid var(--preto);
-  text-align: right;
   color: var(--cinza);
   font-size: 13px;
   line-height: 23px;
   user-select: none;
   overflow: hidden;
-  white-space: pre;
+}
+
+.gutter-line {
+  height: 23px;
+  line-height: 23px;
+  padding: 0 8px 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.gutter-line.is-err {
+  background: var(--coralC);
+  color: var(--verm);
+  font-weight: 700;
+}
+
+.err-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--verm);
+  border: 2px solid var(--preto);
+  flex-shrink: 0;
+}
+
+.editor-code-wrap {
+  position: relative;
+  min-width: 0;
+  background: var(--papel);
+  overflow: hidden;
+}
+
+.code-backdrop {
+  position: absolute;
+  inset: 0;
+  padding: 14px 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.code-line-bg {
+  height: 23px;
+  width: 100%;
+}
+
+.code-line-bg.is-err {
+  background: var(--coralC);
 }
 
 .code-input {
+  position: relative;
+  z-index: 2;
+  display: block;
   width: 100%;
   min-height: 390px;
   margin: 0;
   padding: 14px;
   border: 0;
   resize: vertical;
-  background: var(--papel);
+  background: transparent;
   color: var(--preto);
   font-size: 14px;
   line-height: 23px;

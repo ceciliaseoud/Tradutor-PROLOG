@@ -74,17 +74,20 @@
 
           <div class="editor-shell">
             <label class="sr-only" for="editorCodigo">Código fonte em Prolog</label>
-            <div class="gutter mono" id="editorLinhas" aria-hidden="true">1</div>
-            <textarea
-              id="editorCodigo"
-              class="code-input mono"
-              spellcheck="false"
-              autocomplete="off"
-              autocorrect="off"
-              autocapitalize="off"
-              rows="16"
-              placeholder="% Escreva seu código Prolog aqui..."
-            ></textarea>
+            <div class="gutter mono" id="editorLinhas" aria-hidden="true"></div>
+            <div class="editor-code-wrap">
+              <div class="code-backdrop" id="editorBackdrop" aria-hidden="true"></div>
+              <textarea
+                id="editorCodigo"
+                class="code-input mono"
+                spellcheck="false"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                rows="16"
+                placeholder="% Escreva seu código Prolog aqui..."
+              ></textarea>
+            </div>
           </div>
 
           <footer class="win-footer editor-actions">

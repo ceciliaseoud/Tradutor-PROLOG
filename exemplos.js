@@ -6,6 +6,7 @@ window.EXEMPLOS_PROLOG = {
     arquivo: 'genealogia.pl',
     maquinaTag: { texto: 'Compilado', classe: 'verde' },
     abaInicial: 'tokens',
+    erroLinhas: [],
     codigo: [
       '% Base de conhecimento: arvore genealogica',
       'pai(joao, maria).',
@@ -191,6 +192,7 @@ window.EXEMPLOS_PROLOG = {
     arquivo: 'erro_lexico.pl',
     maquinaTag: { texto: 'Erro · LEX-001', classe: 'ouro' },
     abaInicial: 'diagnostico',
+    erroLinhas: [5],
     codigo: [
       '% Exemplo com erro lexico: simbolo fora do alfabeto',
       'pai(joao, maria).',
@@ -278,6 +280,7 @@ window.EXEMPLOS_PROLOG = {
     arquivo: 'erro_sintatico.pl',
     maquinaTag: { texto: 'Erro · SIN-002', classe: 'coral' },
     abaInicial: 'diagnostico',
+    erroLinhas: [4],
     codigo: [
       '% Exemplo com erro sintatico: parentese nao fechado antes de :-',
       'pai(joao, maria).',

@@ -6,7 +6,8 @@
   const estado = {
     exemploId: 'personalizado',
     compilado: false,
-    abaAtiva: 'tokens'
+    abaAtiva: 'tokens',
+    linhasErro: []
   };
 
   const abas = Array.from(document.querySelectorAll('.machine-tabs [role="tab"]'));
@@ -24,11 +25,22 @@
   function atualizarLinhas() {
     const texto = $('editorCodigo').value;
     const total = Math.max(1, texto.split('\n').length);
-    let numeros = '';
+    const erros = new Set(estado.linhasErro);
+    const primeiraErro = estado.linhasErro.length ? estado.linhasErro[0] : -1;
+
+    let gutterHtml = '';
+    let backdropHtml = '';
     for (let i = 1; i <= total; i++) {
-      numeros += i === total ? String(i) : `${i}\n`;
+      const temErro = erros.has(i);
+      const bolinha = i === primeiraErro ? '<span class="err-dot" aria-hidden="true"></span>' : '';
+      gutterHtml += `<div class="gutter-line${temErro ? ' is-err' : ''}">${bolinha}<span>${i}</span></div>`;
+      backdropHtml += `<div class="code-line-bg${temErro ? ' is-err' : ''}"></div>`;
     }
-    $('editorLinhas').textContent = numeros;
+
+    $('editorLinhas').innerHTML = gutterHtml;
+    $('editorBackdrop').innerHTML = backdropHtml;
+    $('editorLinhas').scrollTop = $('editorCodigo').scrollTop;
+    $('editorBackdrop').scrollTop = $('editorCodigo').scrollTop;
     $('editorMeta').textContent = `${total} ${total === 1 ? 'linha' : 'linhas'}`;
   }
 
@@ -192,6 +204,7 @@
   function ativarPersonalizado(limparCampos, focarEditor) {
     estado.exemploId = 'personalizado';
     estado.compilado = false;
+    estado.linhasErro = [];
 
     if (limparCampos) {
       $('editorCodigo').value = '';
@@ -223,6 +236,7 @@
 
     estado.exemploId = id;
     estado.compilado = false;
+    estado.linhasErro = [];
 
     $('editorCodigo').value = ex.codigo;
     $('inputConsulta').value = ex.consulta;
@@ -254,6 +268,8 @@
 
     const ex = EXEMPLOS[estado.exemploId];
     estado.compilado = true;
+    estado.linhasErro = Array.isArray(ex.erroLinhas) ? ex.erroLinhas.slice() : [];
+    atualizarLinhas();
 
     renderTokens(ex.tokens);
     renderSimbolos(ex.simbolos);
@@ -291,6 +307,8 @@
 
   function limparSaida() {
     estado.compilado = false;
+    estado.linhasErro = [];
+    atualizarLinhas();
     setTag('maquinaTag', 'Aguardando', 'creme');
     setTag('consoleTag', 'Pronto', 'creme');
     renderVazioMaquina('Saída limpa.');
@@ -316,7 +334,9 @@
 
   $('editorCodigo').addEventListener('input', aoEditar);
   $('editorCodigo').addEventListener('scroll', () => {
-    $('editorLinhas').scrollTop = $('editorCodigo').scrollTop;
+    const top = $('editorCodigo').scrollTop;
+    $('editorLinhas').scrollTop = top;
+    $('editorBackdrop').scrollTop = top;
   });
 
   $('inputConsulta').addEventListener('input', aoEditar);
