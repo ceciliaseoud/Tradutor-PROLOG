@@ -470,8 +470,15 @@ h3 {
 
 .action-group {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+}
+
+.editor-actions .action-group .b {
+  flex: 1 1 0;
+  padding: 12px 18px;
+  font-size: 14px;
+  text-align: center;
 }
 
 /* Máquina: abas + painéis */
