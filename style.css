@@ -724,15 +724,6 @@ tbody tr.row-err {
   overflow-x: auto;
 }
 
-.diag-hint {
-  margin: 0;
-  padding: 10px 12px;
-  border: 2px solid var(--preto);
-  border-radius: 6px;
-  background: var(--cianoC);
-  font-size: 13px;
-}
-
 /* Consulta */
 .consulta-row {
   display: flex;

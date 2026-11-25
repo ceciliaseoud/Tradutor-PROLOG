@@ -185,7 +185,6 @@
         </div>
         <p class="note" style="margin:0;color:var(--preto);font-size:13px">${esc(diag.mensagem)}</p>
         <pre class="diag-snippet">${esc(diag.trecho)}</pre>
-        <p class="diag-hint"><strong>Sugestão:</strong> ${esc(diag.sugestao)}</p>
       </div>
     `;
   }

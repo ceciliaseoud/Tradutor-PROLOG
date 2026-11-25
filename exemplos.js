@@ -163,8 +163,7 @@ window.EXEMPLOS_PROLOG = {
       local: 'Linhas 1–10',
       lexema: '6 cláusulas',
       mensagem: 'Todas as cláusulas foram aceitas e carregadas na base de conhecimento.',
-      trecho: 'Base carregada: pai/2 (4 fatos), mae/2 (1 fato), avo/2 (1 regra).',
-      sugestao: 'Execute uma consulta no painel Consulta.'
+      trecho: 'Base carregada: pai/2 (4 fatos), mae/2 (1 fato), avo/2 (1 regra).'
     },
     consoleCompilar: {
       banner: 'COMPILAÇÃO CONCLUÍDA',
@@ -254,8 +253,7 @@ window.EXEMPLOS_PROLOG = {
       local: 'Linha 5, Coluna 12',
       lexema: '$',
       mensagem: 'Caractere "$" rejeitado pelo analisador léxico a partir do estado q0.',
-      trecho: '5 |     pai(X, $Z),\n               ^ caractere inválido',
-      sugestao: 'Substitua "$Z" por uma variável válida, como "Z".'
+      trecho: '5 |     pai(X, $Z),\n               ^ caractere inválido'
     },
     consoleCompilar: {
       banner: 'ERRO LÉXICO · LEX-001',
@@ -375,8 +373,7 @@ window.EXEMPLOS_PROLOG = {
       local: 'Linha 4, Coluna 10',
       lexema: ':- (OP_IMPLICA)',
       mensagem: 'Esperado ")" ou "," após o argumento Y em <Predicado>, encontrado ":-".',
-      trecho: '4 | avo(X, Y :-\n             ^^ esperado ")" antes de ":-"',
-      sugestao: 'Feche os parênteses escrevendo "avo(X, Y) :-" na linha 4.'
+      trecho: '4 | avo(X, Y :-\n             ^^ esperado ")" antes de ":-"'
     },
     consoleCompilar: {
       banner: 'ERRO SINTÁTICO · SIN-002',
