@@ -1,0 +1,1079 @@
+:root {
+  --preto: #0F0F12;
+  --off: #F8F5EC;
+  --papel: #FFFDF8;
+  --grid: #E6DFD0;
+  --cinza: #52505C;
+
+  /* Paleta diversificada em tons pasteis (Trabalho de AD + Web Retrô 90s/2000s) */
+  --roxo: #C4A1FF;
+  --roxoP: #6C4AD0;
+  --lilas: #E8DCFF;
+  --amarelo: #FFE670;
+  --amareloC: #FFF6C6;
+  --rosa: #FFB0D4;
+  --rosaC: #FFE4F1;
+  --ciano: #9AE6FF;
+  --cianoC: #DCF6FF;
+  --verde: #A8E49A;
+  --verdeC: #DDF5D6;
+  --pessego: #FFC88A;
+  --pessegoC: #FFEDD6;
+  --coral: #FF8DA8;
+  --coralC: #FFE0E8;
+  --verm: #C62852;
+  --creme: #F4EEDF;
+
+  --sh: 6px 6px 0 var(--preto);
+  --sh-sm: 3px 3px 0 var(--preto);
+  --sh-btn: 4px 4px 0 var(--preto);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--preto);
+  font: 500 15px/1.45 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: var(--off);
+  background-image:
+    linear-gradient(to right, rgba(15, 15, 18, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 15, 18, 0.055) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.mono,
+table,
+.tag,
+input,
+textarea,
+small,
+.note,
+.count-pill,
+.win-controls {
+  font-family: 'Space Mono', 'Cascadia Mono', Consolas, 'Courier New', monospace;
+}
+
+.mono {
+  font-size: 12px;
+}
+
+.note {
+  font-size: 12px;
+  color: var(--cinza);
+  margin: 8px 0 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -64px;
+  z-index: 30;
+  background: var(--amarelo);
+  color: var(--preto);
+  border: 3px solid var(--preto);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font: 700 13px 'Space Mono', monospace;
+  text-decoration: none;
+  box-shadow: var(--sh-sm);
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+/* Faixa listrada retrô inspirada nas referências 90s/2000s */
+.retro-ribbon {
+  height: 12px;
+  border-bottom: 3px solid var(--preto);
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--rosa) 0,
+    var(--rosa) 12px,
+    var(--amarelo) 12px,
+    var(--amarelo) 24px,
+    var(--ciano) 24px,
+    var(--ciano) 36px,
+    var(--lilas) 36px,
+    var(--lilas) 48px
+  );
+}
+
+.retro-ribbon.bottom {
+  border-bottom: 0;
+  border-top: 3px solid var(--preto);
+}
+
+/* Barra superior fixa (estilo Trabalho de AD + barra de navegador retrô) */
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 24px;
+  background: var(--papel);
+  border-bottom: 3px solid var(--preto);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-wrap: wrap;
+}
+
+.top-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.win-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--preto);
+  border-radius: 6px;
+  background: var(--amarelo);
+  box-shadow: 2px 2px 0 var(--preto);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.address-bar {
+  background: var(--off);
+  border: 3px solid var(--preto);
+  border-radius: 999px;
+  padding: 5px 14px;
+  box-shadow: 2px 2px 0 var(--preto);
+  font-weight: 700;
+}
+
+.top-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+main {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px 20px 56px;
+}
+
+h1 {
+  font-size: 44px;
+  line-height: 1.05;
+  margin: 4px 0 8px;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 21px;
+  margin: 30px 0 12px;
+}
+
+h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* Botões táteis 3D (Trabalho de AD + keycaps retrô) */
+.b {
+  font: 700 13px 'Space Mono', monospace;
+  border: 3px solid var(--preto);
+  border-radius: 10px;
+  padding: 9px 16px;
+  cursor: pointer;
+  box-shadow: var(--sh-btn);
+  color: var(--preto);
+  background: var(--papel);
+  transition: transform 0.06s ease, box-shadow 0.06s ease, filter 0.12s ease;
+}
+
+.b:hover:not(:disabled) {
+  filter: brightness(0.97);
+}
+
+.b:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 var(--preto);
+}
+
+.b:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.b.verde { background: var(--verde); }
+.b.rosa { background: var(--rosa); }
+.b.ciano { background: var(--ciano); }
+.b.lil { background: var(--roxo); }
+.b.ouro { background: var(--amarelo); }
+.b.creme { background: var(--creme); }
+.b.coral { background: var(--coral); }
+
+/* Cards e janelas retrô */
+.card {
+  background: var(--papel);
+  border: 3px solid var(--preto);
+  box-shadow: var(--sh);
+  border-radius: 8px;
+}
+
+.pad {
+  padding: 18px;
+}
+
+/* Hero (Trabalho de AD) */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  background: linear-gradient(135deg, var(--rosaC) 0%, var(--papel) 52%, var(--cianoC) 100%);
+  border: 3px solid var(--preto);
+  border-radius: 10px;
+  box-shadow: var(--sh);
+  padding: 20px 22px;
+}
+
+.hero-copy {
+  max-width: 720px;
+}
+
+.eyebrow {
+  margin: 0;
+  font-weight: 700;
+  color: var(--roxoP);
+}
+
+.lead {
+  margin: 0;
+  color: #24232B;
+}
+
+.hero-r {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Tags e badges pastel */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 3px solid var(--preto);
+  border-radius: 999px;
+  padding: 3px 11px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--papel);
+  color: var(--preto);
+  white-space: nowrap;
+}
+
+.tag.lil { background: var(--lilas); }
+.tag.verde { background: var(--verde); }
+.tag.verdeC { background: var(--verdeC); }
+.tag.ouro { background: var(--amarelo); }
+.tag.rosa { background: var(--rosa); }
+.tag.ciano { background: var(--ciano); }
+.tag.pessego { background: var(--pessego); }
+.tag.coral { background: var(--coral); }
+.tag.creme { background: var(--creme); }
+.tag.verm { background: var(--verm); color: #fff; }
+
+.rowhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Deck de exemplos e pipeline Aula 5 */
+.control-deck {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.2fr);
+  gap: 20px;
+  align-items: start;
+  background: var(--papel);
+}
+
+.picker-label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.seg {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.seg button {
+  flex: 1 1 140px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font: 700 13px 'Space Mono', monospace;
+  border: 3px solid var(--preto);
+  background: var(--papel);
+  color: var(--preto);
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: var(--sh-sm);
+  transition: transform 0.06s ease, box-shadow 0.06s ease;
+}
+
+.seg button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--preto);
+}
+
+.seg button.on {
+  background: var(--roxo);
+}
+
+.seg button[data-ex="valido"].on {
+  background: var(--verde);
+}
+
+.seg button[data-ex="erro-lexico"].on {
+  background: var(--amarelo);
+}
+
+.seg button[data-ex="erro-sintatico"].on {
+  background: var(--coral);
+}
+
+.ex-dot {
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--preto);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ex-dot.verde { background: var(--verde); }
+.ex-dot.ouro { background: var(--amarelo); }
+.ex-dot.coral { background: var(--coral); }
+
+/* Pipeline segmentado estilo barra retrô */
+.pipeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pipe-step {
+  flex: 1 1 88px;
+  border: 3px solid var(--preto);
+  border-radius: 6px;
+  padding: 7px 8px;
+  background: var(--off);
+  box-shadow: 2px 2px 0 var(--preto);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pipe-step strong {
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pipe-step.ok { background: var(--verdeC); }
+.pipe-step.ativo { background: var(--amareloC); }
+.pipe-step.erro { background: var(--coralC); }
+.pipe-step.editado { background: var(--pessegoC); }
+
+.pipe-arrow {
+  font: 700 15px 'Space Mono', monospace;
+  user-select: none;
+}
+
+/* Banner de orientação ao editar */
+.edit-banner {
+  margin-top: 14px;
+  background: var(--pessegoC);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.edit-banner-body p {
+  margin: 8px 0 0;
+  max-width: 780px;
+}
+
+/* Layout principal Aula 5: Editor à esquerda; Máquina, Consulta e Console à direita */
+.ide-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.96fr) minmax(0, 1.14fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.ide-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* Janelas retrô OS */
+.win {
+  overflow: hidden;
+  min-width: 0;
+}
+
+.win-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-bottom: 3px solid var(--preto);
+}
+
+.bg-amarelo { background: var(--amarelo); }
+.bg-lilas { background: var(--lilas); }
+.bg-rosa { background: var(--rosa); }
+.bg-ciano { background: var(--ciano); }
+
+.win-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.win-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--preto);
+  border-radius: 5px;
+  background: var(--papel);
+  font: 700 12px 'Space Mono', monospace;
+  flex-shrink: 0;
+}
+
+.win-file {
+  background: rgba(255, 253, 248, 0.78);
+  border: 2px solid var(--preto);
+  border-radius: 5px;
+  padding: 1px 7px;
+  font-weight: 700;
+}
+
+.win-controls {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.win-controls span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--preto);
+  border-radius: 4px;
+  background: var(--papel);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.win-subbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 14px;
+  background: var(--amareloC);
+  border-bottom: 3px solid var(--preto);
+}
+
+.win-body {
+  padding: 14px;
+}
+
+.win-footer {
+  padding: 14px;
+  border-top: 3px solid var(--preto);
+  background: var(--off);
+}
+
+/* Editor Prolog com numeração de linhas */
+.editor-shell {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  background: var(--papel);
+  min-height: 390px;
+}
+
+.gutter {
+  padding: 14px 8px;
+  background: var(--creme);
+  border-right: 3px solid var(--preto);
+  text-align: right;
+  color: var(--cinza);
+  font-size: 13px;
+  line-height: 23px;
+  user-select: none;
+  overflow: hidden;
+  white-space: pre;
+}
+
+.code-input {
+  width: 100%;
+  min-height: 390px;
+  margin: 0;
+  padding: 14px;
+  border: 0;
+  resize: vertical;
+  background: var(--papel);
+  color: var(--preto);
+  font-size: 14px;
+  line-height: 23px;
+  tab-size: 4;
+}
+
+.code-input:focus {
+  outline: none;
+}
+
+.editor-shell:focus-within {
+  box-shadow: inset 0 0 0 3px var(--roxoP);
+}
+
+.action-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Máquina: faixa simulada + abas + painéis */
+.sim-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border: 3px solid var(--preto);
+  border-radius: 6px;
+  background: var(--amareloC);
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font: 700 12px 'Space Mono', monospace;
+  border: 3px solid var(--preto);
+  background: var(--papel);
+  color: var(--preto);
+  padding: 7px 11px;
+  border-radius: 7px;
+  box-shadow: var(--sh-sm);
+  cursor: pointer;
+}
+
+.tab-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--preto);
+}
+
+.tab-btn.on {
+  background: var(--roxo);
+}
+
+.tab-btn[data-tab="tokens"].on { background: var(--ciano); }
+.tab-btn[data-tab="simbolos"].on { background: var(--verde); }
+.tab-btn[data-tab="arvore"].on { background: var(--lilas); }
+.tab-btn[data-tab="diagnostico"].on { background: var(--rosa); }
+
+.count-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 5px;
+  border: 2px solid var(--preto);
+  border-radius: 999px;
+  background: var(--papel);
+  font-size: 11px;
+}
+
+.machine-panel {
+  border: 3px solid var(--preto);
+  border-radius: 6px;
+  background: var(--papel);
+  max-height: 310px;
+  overflow: auto;
+}
+
+/* Tabelas estilo Trabalho de AD */
+.tabela {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+th {
+  background: var(--preto);
+  color: #fff;
+  text-align: left;
+  padding: 8px 10px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+td {
+  padding: 8px 10px;
+  border-top: 2px solid var(--preto);
+  vertical-align: top;
+}
+
+tbody tr:nth-child(even) {
+  background: var(--lilas);
+}
+
+tbody tr.row-err {
+  background: var(--coralC);
+  font-weight: 700;
+}
+
+.tok-chip {
+  display: inline-block;
+  border: 2px solid var(--preto);
+  border-radius: 5px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--cianoC);
+}
+
+.tok-chip.var { background: var(--amareloC); }
+.tok-chip.op { background: var(--rosaC); }
+.tok-chip.delim { background: var(--creme); }
+.tok-chip.ok { background: var(--verdeC); }
+.tok-chip.err { background: var(--coral); }
+
+/* Árvore de derivação retrô */
+.tree-wrap {
+  padding: 14px;
+}
+
+.tree-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.tree-list,
+.tree-list ul {
+  list-style: none;
+  margin: 0;
+  padding-left: 18px;
+  position: relative;
+}
+
+.tree-list {
+  padding-left: 0;
+}
+
+.tree-list ul {
+  margin-top: 6px;
+  border-left: 2px dashed var(--preto);
+  margin-left: 10px;
+}
+
+.tree-list li {
+  margin: 6px 0;
+}
+
+.tree-node {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  border: 2px solid var(--preto);
+  border-radius: 6px;
+  padding: 3px 8px;
+  background: var(--lilas);
+  font: 700 12px 'Space Mono', monospace;
+}
+
+.tree-node.terminal {
+  background: var(--verdeC);
+  font-weight: 400;
+}
+
+.tree-node.erro {
+  background: var(--coral);
+}
+
+.tree-node small {
+  font-size: 11px;
+  color: #292730;
+}
+
+/* Diagnóstico e estados vazios */
+.panel-empty {
+  padding: 18px;
+  background: var(--off);
+}
+
+.panel-empty.edit-state {
+  background: var(--pessegoC);
+}
+
+.panel-empty p {
+  margin: 8px 0 0;
+}
+
+.diag-box {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.diag-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border: 3px solid var(--preto);
+  border-radius: 6px;
+}
+
+.diag-header.ok { background: var(--verdeC); }
+.diag-header.lex { background: var(--amareloC); }
+.diag-header.sin { background: var(--coralC); }
+
+.diag-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.diag-kv {
+  border: 2px solid var(--preto);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: var(--off);
+}
+
+.diag-kv span {
+  display: block;
+  font-size: 11px;
+  color: var(--cinza);
+}
+
+.diag-kv strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+}
+
+.diag-snippet {
+  margin: 0;
+  padding: 10px 12px;
+  border: 2px solid var(--preto);
+  border-radius: 6px;
+  background: var(--papel);
+  font: 400 12px/1.5 'Space Mono', monospace;
+  overflow-x: auto;
+}
+
+.diag-hint {
+  margin: 0;
+  padding: 10px 12px;
+  border: 2px solid var(--preto);
+  border-radius: 6px;
+  background: var(--cianoC);
+  font-size: 13px;
+}
+
+/* Consulta */
+.consulta-label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.consulta-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.query-field {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  border: 3px solid var(--preto);
+  border-radius: 8px;
+  box-shadow: var(--sh-sm);
+  background: var(--papel);
+  overflow: hidden;
+}
+
+.query-field:focus-within {
+  outline: 3px solid var(--roxoP);
+  outline-offset: 2px;
+}
+
+.query-prompt {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 11px;
+  background: var(--rosaC);
+  border-right: 3px solid var(--preto);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.query-field input {
+  width: 100%;
+  border: 0;
+  padding: 10px 12px;
+  font-size: 14px;
+  background: transparent;
+  color: var(--preto);
+}
+
+.query-field input:focus {
+  outline: none;
+}
+
+/* Console retrô pastel */
+.console-screen {
+  min-height: 150px;
+  max-height: 240px;
+  overflow: auto;
+  padding: 12px 14px;
+  border: 3px solid var(--preto);
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      var(--cianoC) 0,
+      var(--cianoC) 24px,
+      #EDF9FF 24px,
+      #EDF9FF 48px
+    );
+  color: var(--preto);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.console-banner {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 2px 8px;
+  border: 2px solid var(--preto);
+  border-radius: 5px;
+  background: var(--amarelo);
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.console-banner.ok { background: var(--verde); }
+.console-banner.err { background: var(--coral); }
+.console-banner.edit { background: var(--pessego); }
+
+.console-lines {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+}
+
+/* Estados da interface (inspirado na seção 05 do Trabalho de AD) */
+.estados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.estados .card {
+  opacity: 0.56;
+  transition: opacity 0.15s ease;
+}
+
+.estados .card.atual {
+  opacity: 1;
+  outline: 4px solid var(--preto);
+  outline-offset: 3px;
+}
+
+.state-title {
+  display: inline-block;
+  font-weight: 700;
+  margin-bottom: 6px;
+  padding: 2px 8px;
+  border: 2px solid var(--preto);
+  border-radius: 999px;
+  background: var(--papel);
+}
+
+.estados p {
+  margin: 4px 0 0;
+  font-size: 13px;
+}
+
+.lilbg { background: var(--lilas); }
+.verdebg { background: var(--verdeC); }
+.ourobg { background: var(--amareloC); }
+.coralbg { background: var(--coralC); }
+.pessegobg { background: var(--pessegoC); }
+
+/* Rodapé (Trabalho de AD) */
+footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 20px 24px;
+  border-top: 3px solid var(--preto);
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+:focus-visible {
+  outline: 3px solid var(--roxoP);
+  outline-offset: 2px;
+}
+
+@media (max-width: 900px) {
+  .control-deck,
+  .ide-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    flex-direction: column;
+  }
+
+  .hero-r {
+    align-items: flex-start;
+  }
+
+  h1 {
+    font-size: 34px;
+  }
+
+  .editor-shell,
+  .code-input {
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 600px) {
+  .top {
+    padding: 10px 14px;
+  }
+
+  main {
+    padding: 16px 12px 44px;
+  }
+
+  .top-actions {
+    width: 100%;
+  }
+
+  .top-actions .b {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  .consulta-row {
+    flex-direction: column;
+  }
+
+  .pipe-arrow {
+    display: none;
+  }
+
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .address-bar {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+
+  footer {
+    padding: 16px 12px;
+  }
+}
