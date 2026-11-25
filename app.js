@@ -1,14 +1,9 @@
-/* Controlador da interface simulada do Tradutor Prolog (Item 4). */
+/* Controlador da interface do Tradutor Prolog. */
 (function () {
   const $ = id => document.getElementById(id);
   const EXEMPLOS = window.EXEMPLOS_PROLOG || {};
 
-  const estado = {
-    exemploId: 'valido',
-    fase: 'carregado',
-    compilado: false,
-    abaAtiva: 'tokens'
-  };
+  const estado = { exemploId: 'valido', fase: 'carregado', requisicao: 0 };
 
   const abas = Array.from(document.querySelectorAll('.machine-tabs [role="tab"]'));
   const botoesExemplo = Array.from(document.querySelectorAll('.ex-btn'));
@@ -30,8 +25,7 @@
       numeros += i === total ? String(i) : `${i}\n`;
     }
     $('editorLinhas').textContent = numeros;
-    const sufixo = notaExtra || (estado.exemploId ? 'sem erros exibidos' : 'aguardando exemplo');
-    $('editorMeta').textContent = `${total} ${total === 1 ? 'linha' : 'linhas'} · ${sufixo}`;
+    $('editorMeta').textContent = `${total} ${total === 1 ? 'linha' : 'linhas'} · ${notaExtra}`;
   }
 
   function setTag(id, texto, classe) {
@@ -65,7 +59,6 @@
   }
 
   function selecionarAba(nomeAba, focar) {
-    estado.abaAtiva = nomeAba;
     abas.forEach(btn => {
       const ativa = btn.dataset.tab === nomeAba;
       btn.classList.toggle('on', ativa);
@@ -83,22 +76,13 @@
       `<pre class="console-lines">${esc(linhas.join('\n'))}</pre>`;
   }
 
-  function renderVazioMaquina(modoEditado) {
+  function renderVazioMaquina() {
     $('badgeTokens').textContent = '0';
     $('badgeSimbolos').textContent = '0';
     $('badgeArvore').textContent = '–';
     $('badgeDiag').textContent = '–';
 
-    const bloco = modoEditado
-      ? `<div class="panel-empty edit-state">
-           <span class="tag pessego">Saída anterior limpa</span>
-           <p>O código ou a consulta foi editado manualmente. Este protótipo trabalha apenas com <strong>resultados simulados</strong> para cenários cadastrados.</p>
-           <p><strong>Próximo passo:</strong> carregue <em>Programa válido</em>, <em>Erro léxico</em> ou <em>Erro sintático</em> na seção 01 para testar <strong>Compilar</strong> e <strong>Executar consulta</strong>.</p>
-         </div>`
-      : `<div class="panel-empty">
-           <span class="tag lil">Aguardando compilação simulada</span>
-           <p>Clique em <strong>Compilar</strong> para preencher tokens, tabela de símbolos, árvore de derivação e diagnóstico do exemplo carregado.</p>
-         </div>`;
+    const bloco = '<div class="panel-empty"><p>Clique em <strong>Compilar</strong> para analisar o programa do editor.</p></div>';
 
     $('panel-tokens').innerHTML = bloco;
     $('panel-simbolos').innerHTML = bloco;
@@ -107,15 +91,20 @@
   }
 
   function renderTokens(tokens) {
-    const linhas = tokens.map(t => `
-      <tr class="${t.erro ? 'row-err' : ''}">
-        <td>${t.n}</td>
+    const classes = { atomo: ['Átomo', 'ok'], atomo_citado: ['Átomo entre aspas', 'ok'], variavel: ['Variável', 'var'],
+      inteiro: ['Inteiro', 'ok'], decimal: ['Decimal', 'ok'], operador: ['Operador', 'op'], delimitador: ['Delimitador', 'delim'] };
+    const linhas = tokens.map((t, i) => {
+      const [classe, cor] = classes[t.classe] || ['Inválido', 'err'];
+      return `
+      <tr class="${cor === 'err' ? 'row-err' : ''}">
+        <td>${i + 1}</td>
         <td><strong>${esc(t.lexema)}</strong></td>
-        <td><span class="tok-chip ${esc(t.tipo)}">${esc(t.classe)}</span></td>
-        <td>${esc(t.pos)}</td>
-        <td>${esc(t.sym)}</td>
+        <td><span class="tok-chip ${cor}">${classe}</span></td>
+        <td>${t.linha}:${t.coluna}</td>
+        <td>${esc(t.simbolo ?? '–')}</td>
       </tr>
-    `).join('');
+    `;
+    }).join('');
 
     $('panel-tokens').innerHTML = `
       <div class="tabela">
@@ -141,8 +130,8 @@
         <td><strong>${esc(s.id)}</strong></td>
         <td>${esc(s.lexema)}</td>
         <td><span class="tok-chip ${s.categoria === 'Variável' ? 'var' : 'ok'}">${esc(s.categoria)}</span></td>
-        <td>${esc(s.detalhe)}</td>
-        <td>${esc(s.linhas)}</td>
+        <td>${s.ocorrencias}</td>
+        <td>${s.linhas.join(', ')}</td>
       </tr>
     `).join('');
 
@@ -154,7 +143,7 @@
               <th>ID</th>
               <th>Lexema</th>
               <th>Categoria</th>
-              <th>Detalhe</th>
+              <th>Ocorrências</th>
               <th>Linhas</th>
             </tr>
           </thead>
@@ -166,19 +155,17 @@
 
   function renderNoArvore(no) {
     const tipoClasse = no.tipo ? ` ${esc(no.tipo)}` : '';
-    const nota = no.nota ? `<small>(${esc(no.nota)})</small>` : '';
     const filhos = Array.isArray(no.filhos) && no.filhos.length
       ? `<ul>${no.filhos.map(renderNoArvore).join('')}</ul>`
       : '';
-    return `<li><span class="tree-node${tipoClasse}">${esc(no.rotulo)}${nota}</span>${filhos}</li>`;
+    return `<li><span class="tree-node${tipoClasse}">${esc(no.rotulo)}</span>${filhos}</li>`;
   }
 
-  function renderArvore(ex) {
-    if (!ex.arvore) {
+  function renderArvore(arvore) {
+    if (!arvore) {
       $('panel-arvore').innerHTML = `
         <div class="panel-empty">
-          <span class="tag ouro">Árvore não gerada (simulado)</span>
-          <p>${esc(ex.arvoreIndisponivel)}</p>
+          <p>Corrija os erros léxicos para gerar a árvore sintática.</p>
         </div>
       `;
       return;
@@ -186,232 +173,154 @@
 
     $('panel-arvore').innerHTML = `
       <div class="tree-wrap">
-        <div class="tree-meta">
-          <span class="tag lil">GLC simplificada · Simulado</span>
-          <span class="mono">${esc(ex.arvore.resumo)}</span>
-        </div>
-        <ul class="tree-list">
-          ${renderNoArvore(ex.arvore.raiz)}
-        </ul>
+        <ul class="tree-list">${renderNoArvore(arvore)}</ul>
       </div>
     `;
   }
 
-  function renderDiagnostico(diag) {
-    const badgeClasse = diag.tipo === 'ok' ? 'verde' : diag.tipo === 'lex' ? 'ouro' : 'coral';
-    $('panel-diagnostico').innerHTML = `
+  function renderDiagnosticos(diagnosticos, fonte) {
+    if (!diagnosticos.length) {
+      $('panel-diagnostico').innerHTML = '<div class="diag-box"><div class="diag-header ok">Programa analisado sem erros.</div></div>';
+      return;
+    }
+    const linhas = fonte.split(/\r\n?|\n/);
+    $('panel-diagnostico').innerHTML = diagnosticos.map(d => {
+      const linha = linhas[d.linha - 1] ?? '';
+      const marcador = [...linha].slice(0, d.coluna - 1).map(c => c === '\t' ? '\t' : ' ').join('');
+      return `
       <div class="diag-box">
-        <div class="diag-header ${esc(diag.tipo)}">
-          <strong>${esc(diag.titulo)}</strong>
-          <span class="tag ${badgeClasse}">${esc(diag.codigo)} · Simulado</span>
+        <div class="diag-header ${d.fase === 'léxica' ? 'lex' : 'sin'}">
+          <strong>${esc(d.mensagem)}</strong><span class="mono">${d.linha}:${d.coluna}</span>
         </div>
-        <div class="diag-grid">
-          <div class="diag-kv"><span>Etapa</span><strong>${esc(diag.fase)}</strong></div>
-          <div class="diag-kv"><span>Localização</span><strong>${esc(diag.local)}</strong></div>
-          <div class="diag-kv"><span>Elemento</span><strong>${esc(diag.lexema)}</strong></div>
-        </div>
-        <p class="note" style="margin:0;color:var(--preto);font-size:13px">${esc(diag.mensagem)}</p>
-        <pre class="diag-snippet">${esc(diag.trecho)}</pre>
-        <p class="diag-hint"><strong>Orientação:</strong> ${esc(diag.sugestao)}</p>
-      </div>
-    `;
+        <pre class="diag-snippet">${esc(`${linha}\n${marcador}^`)}</pre>
+      </div>`;
+    }).join('');
   }
 
   function carregarExemplo(id) {
     const ex = EXEMPLOS[id];
     if (!ex) return;
-
     estado.exemploId = id;
-    estado.fase = 'carregado';
-    estado.compilado = false;
-
     $('editorCodigo').value = ex.codigo;
     $('inputConsulta').value = ex.consulta;
     $('editorArquivo').textContent = ex.arquivo;
     $('exemploDesc').textContent = ex.descricao;
     $('exemploAtivoInfo').textContent = `Exemplo ativo: ${ex.titulo}`;
     $('avisoEdicao').hidden = true;
-
     botoesExemplo.forEach(btn => {
       const ativo = btn.dataset.ex === id;
       btn.classList.toggle('on', ativo);
-      btn.setAttribute('aria-pressed', ativo ? 'true' : 'false');
+      btn.setAttribute('aria-pressed', String(ativo));
     });
-
-    setTag('statusGlobal', 'Exemplo carregado', 'lil');
-    setTag('editorModo', 'Exemplo cadastrado', 'verdeC');
-    setTag('maquinaTag', 'Aguardando compilação', 'creme');
-    setTag('consoleTag', 'Saída simulada', 'ouro');
-    $('maquinaResumo').textContent = `Exemplo "${ex.titulo}" pronto. Clique em Compilar para gerar as saídas simuladas.`;
-
-    renderVazioMaquina(false);
+    limparSaida();
     selecionarAba('tokens', false);
+  }
 
-    renderConsole('SAÍDA SIMULADA · PRONTO', 'edit', [
-      `[SIMULAÇÃO] Exemplo "${ex.titulo}" (${ex.arquivo}) carregado no Editor Prolog.`,
-      `Consulta pronta: ?- ${ex.consulta}`,
-      'Clique em "Compilar" para inspecionar a Máquina ou em "Executar consulta" para ver a saída cadastrada.'
-    ]);
+  async function enviar(rota, dados) {
+    const requisicao = ++estado.requisicao;
+    try {
+      const resposta = await fetch(rota, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+      });
+      const resultado = await resposta.json();
+      if (!resposta.ok) throw new Error(resultado.erro);
+      return requisicao === estado.requisicao ? resultado : null;
+    } catch (falha) {
+      if (requisicao !== estado.requisicao) return null;
+      const mensagem = falha instanceof TypeError ? 'Inicie o servidor com node server.js e abra http://127.0.0.1:3000.' : falha.message;
+      setTag('consoleTag', 'Erro de comunicação', 'coral');
+      renderConsole('ERRO NA REQUISIÇÃO', 'err', [mensagem]);
+      return null;
+    }
+  }
 
+  async function compilar() {
+    const codigo = $('editorCodigo').value;
+    const resultado = await enviar('/api/compilar', { codigo });
+    if (!resultado) return;
+    const { tokens, simbolos, arvore, diagnosticos, clausulas } = resultado;
+    const erro = diagnosticos[0], lexico = erro?.fase === 'léxica';
+    const status = erro ? (lexico ? 'Erro léxico' : 'Erro sintático') : 'Compilado';
+    estado.fase = erro ? (lexico ? 'erro-lexico' : 'erro-sintatico') : 'compilado';
+
+    renderTokens(tokens);
+    renderSimbolos(simbolos);
+    renderArvore(arvore);
+    renderDiagnosticos(diagnosticos, codigo);
+    $('badgeTokens').textContent = tokens.length;
+    $('badgeSimbolos').textContent = simbolos.length;
+    $('badgeArvore').textContent = arvore ? (erro ? 'Parcial' : '✓') : '–';
+    $('badgeDiag').textContent = diagnosticos.length;
+    setTag('statusGlobal', status, erro ? 'coral' : 'verde');
+    setTag('maquinaTag', status, erro ? 'coral' : 'verde');
+    setTag('consoleTag', erro ? 'Bloqueada' : 'Pronto', erro ? 'coral' : 'verde');
+    $('maquinaResumo').textContent = erro ? 'Corrija o código no editor.' : `${clausulas} cláusula(s) disponível(is) para consulta.`;
+
+    renderConsole(status.toUpperCase(), erro ? 'err' : 'ok', erro
+      ? diagnosticos.map(d => `${d.linha}:${d.coluna} · ${d.mensagem}`)
+      : ['Clique em Executar consulta para consultar a base.']);
     setPipeline({
-      programa: { texto: 'Carregado', classe: 'ativo' },
-      lexico: { texto: 'Aguardando', classe: '' },
-      sintatico: { texto: 'Aguardando', classe: '' },
-      maquina: { texto: 'Aguardando', classe: '' },
-      console: { texto: 'Aguardando', classe: '' }
+      programa: { texto: 'Analisado', classe: 'ok' },
+      lexico: { texto: lexico ? 'Erro léxico' : `${tokens.length} tokens`, classe: lexico ? 'erro' : 'ok' },
+      sintatico: { texto: lexico ? 'Aguardando' : erro ? 'Erro sintático' : 'Válido', classe: lexico ? '' : erro ? 'erro' : 'ok' },
+      maquina: { texto: erro ? 'Bloqueada' : `${clausulas} cláusulas`, classe: erro ? 'erro' : 'ok' },
+      console: { texto: erro ? 'Bloqueado' : 'Pronto', classe: erro ? 'erro' : 'ativo' }
     });
-
-    atualizarLinhas('pronto para compilar');
+    selecionarAba(erro ? 'diagnostico' : 'tokens', false);
+    atualizarLinhas(erro ? status : 'sem erros');
     atualizarCardsEstado();
   }
 
-  function orientarEdicao(acao) {
-    $('avisoEdicao').hidden = false;
-    $('avisoEdicaoTexto').innerHTML =
-      `Não foi possível executar <strong>${esc(acao)}</strong> porque o código ou a consulta foi editado manualmente. ` +
-      'Esta interface demonstra apenas <strong>saídas simuladas</strong> de exemplos cadastrados — carregue ' +
-      '<strong>Programa válido</strong>, <strong>Erro léxico</strong> ou <strong>Erro sintático</strong> acima para testar os controles.';
-
-    renderConsole('SAÍDA SIMULADA · CARREGUE UM EXEMPLO', 'edit', [
-      `[MODO SIMULADO] Ação "${acao}" indisponível para texto editado manualmente.`,
-      'Carregue um dos exemplos cadastrados (Programa válido, Erro léxico ou Erro sintático) na seção 01 para testar os controles.'
-    ]);
-  }
-
-  function compilar() {
-    if (!estado.exemploId) {
-      orientarEdicao('Compilar');
-      return;
+  async function executarConsulta() {
+    const codigo = $('editorCodigo').value, consulta = $('inputConsulta').value;
+    const resultado = await enviar('/api/consultar', { codigo, consulta });
+    if (!resultado) return;
+    const linhas = [`?- ${consulta.trim().replace(/^\?-\s*/, '')}`, ''];
+    const { diagnosticos, origem, solucoes, saida, erro, limitada } = resultado;
+    if (saida) linhas.push(saida.replace(/\n$/, ''));
+    if (diagnosticos) {
+      for (const d of diagnosticos) linhas.push(`Erro no ${origem === 'programa' ? 'programa' : 'texto da consulta'} (${d.linha}:${d.coluna}). ${d.mensagem}`);
+    } else {
+      const respostas = solucoes.map(s => Object.entries(s).map(([nome, valor]) => `${nome} = ${valor}`).join(', ') || 'true');
+      if (respostas.length) linhas.push(`${respostas.join(' ;\n')}.`);
+      else if (!erro) linhas.push('false.');
+      if (limitada) linhas.push('Exibindo as primeiras 100 soluções.');
+      if (erro) linhas.push(erro);
     }
-
-    const ex = EXEMPLOS[estado.exemploId];
-    estado.compilado = true;
-    estado.fase = ex.estadoCompilado;
-
-    renderTokens(ex.tokens);
-    renderSimbolos(ex.simbolos);
-    renderArvore(ex);
-    renderDiagnostico(ex.diagnostico);
-
-    $('badgeTokens').textContent = String(ex.tokens.length);
-    $('badgeSimbolos').textContent = String(ex.simbolos.length);
-    $('badgeArvore').textContent = ex.arvoreBadge;
-    $('badgeDiag').textContent = ex.diagnosticoBadge;
-
-    setTag('statusGlobal', ex.statusTag.texto, ex.statusTag.classe);
-    setTag('maquinaTag', ex.maquinaTag.texto, ex.maquinaTag.classe);
-    $('maquinaResumo').textContent = ex.maquinaResumo;
-
-    setTag(
-      'consoleTag',
-      ex.id === 'valido' ? 'Compilado · Simulado' : 'Erro · Simulado',
-      ex.id === 'valido' ? 'verde' : 'coral'
-    );
-
-    renderConsole(ex.consoleCompilar.banner, ex.consoleCompilar.bannerClasse, ex.consoleCompilar.linhas);
-    setPipeline(ex.pipeline);
-    selecionarAba(ex.abaInicial, false);
-
-    const metaNota = ex.id === 'valido' ? '0 erros (simulado)' : `${ex.diagnostico.codigo} marcado (simulado)`;
-    atualizarLinhas(metaNota);
-    atualizarCardsEstado();
-  }
-
-  function executarConsulta() {
-    if (!estado.exemploId) {
-      orientarEdicao('Executar consulta');
-      return;
-    }
-
-    const ex = EXEMPLOS[estado.exemploId];
-    const linhas = ex.consoleConsulta.linhas.slice();
-    if (!estado.compilado) {
-      linhas.push('', 'Dica: clique em "Compilar" para inspecionar tokens, símbolos, árvore e diagnóstico na Máquina.');
-    }
-
-    renderConsole(ex.consoleConsulta.banner, ex.consoleConsulta.bannerClasse, linhas);
-
-    const ok = ex.id === 'valido';
-    setTag('consoleTag', ok ? 'Resposta simulada' : 'Bloqueada · Simulado', ok ? 'verde' : 'coral');
-
-    const stepConsole = document.querySelector('.pipe-step[data-stage="console"]');
-    if (stepConsole) {
-      stepConsole.className = `pipe-step ${ok ? 'ok' : 'erro'}`;
-    }
-    $('pipeConsole').textContent = ok ? '2 soluções' : 'Bloqueada';
+    const falhou = Boolean(erro || diagnosticos);
+    renderConsole(falhou ? 'CONSULTA INTERROMPIDA' : 'RESULTADO DA CONSULTA', falhou ? 'err' : 'ok', linhas);
+    setTag('consoleTag', falhou ? 'Consulta interrompida' : 'Consulta concluída', falhou ? 'coral' : 'verde');
+    $('pipeConsole').textContent = falhou ? 'Interrompida' : `${solucoes.length} solução(ões)`;
+    $('pipeConsole').parentElement.className = `pipe-step ${falhou ? 'erro' : 'ok'}`;
   }
 
   function limparSaida() {
-    if (!estado.exemploId) {
-      aoEditar('manual');
-      return;
-    }
-    const ex = EXEMPLOS[estado.exemploId];
-    estado.compilado = false;
-    estado.fase = 'carregado';
-
-    setTag('statusGlobal', 'Exemplo carregado', 'lil');
-    setTag('maquinaTag', 'Saída limpa', 'creme');
-    setTag('consoleTag', 'Saída simulada', 'ouro');
-    $('maquinaResumo').textContent = `Saídas limpas para "${ex.titulo}". Clique em Compilar para gerar novamente.`;
-
-    renderVazioMaquina(false);
-    renderConsole('SAÍDA SIMULADA · LIMPA', 'edit', [
-      `[SIMULAÇÃO] Saídas anteriores limpas. O exemplo "${ex.titulo}" continua carregado no editor.`,
-      'Clique em "Compilar" ou "Executar consulta" para visualizar os dados simulados.'
-    ]);
-
-    setPipeline({
-      programa: { texto: 'Carregado', classe: 'ativo' },
-      lexico: { texto: 'Aguardando', classe: '' },
-      sintatico: { texto: 'Aguardando', classe: '' },
-      maquina: { texto: 'Aguardando', classe: '' },
-      console: { texto: 'Limpo', classe: '' }
-    });
-    atualizarLinhas('saída limpa');
+    estado.requisicao++;
+    const exemplo = estado.exemploId !== null;
+    estado.fase = exemplo ? 'carregado' : 'editado';
+    setTag('statusGlobal', exemplo ? 'Exemplo carregado' : 'Editado', exemplo ? 'lil' : 'pessego');
+    setTag('editorModo', exemplo ? 'Exemplo cadastrado' : 'Editado manualmente', exemplo ? 'verdeC' : 'pessego');
+    setTag('maquinaTag', 'Aguardando compilação', 'creme');
+    setTag('consoleTag', 'Pronto', 'ouro');
+    $('maquinaResumo').textContent = 'Clique em Compilar para analisar o código atual.';
+    renderVazioMaquina();
+    renderConsole('PRONTO', 'edit', ['Clique em Executar consulta para consultar o programa do editor.']);
+    setPipeline({ programa: { texto: exemplo ? 'Carregado' : 'Editado', classe: exemplo ? 'ativo' : 'editado' } });
+    atualizarLinhas('aguardando compilação');
     atualizarCardsEstado();
   }
 
-  function aoEditar(origem) {
+  function aoEditar() {
     estado.exemploId = null;
-    estado.fase = 'editado';
-    estado.compilado = false;
-
     botoesExemplo.forEach(btn => {
       btn.classList.remove('on');
       btn.setAttribute('aria-pressed', 'false');
     });
-
-    const alvo = origem === 'consulta' ? 'a consulta' : 'o código Prolog';
-    setTag('statusGlobal', 'Editado · Saída limpa', 'pessego');
-    setTag('editorModo', 'Editado manualmente', 'pessego');
-    setTag('maquinaTag', 'Saída limpa', 'pessego');
-    setTag('consoleTag', 'Saída limpa', 'pessego');
-    $('exemploAtivoInfo').textContent = 'Exemplo ativo: nenhum (conteúdo editado)';
-    $('maquinaResumo').textContent = 'Saídas anteriores limpas após edição. Carregue um exemplo cadastrado para testar os controles.';
-
+    $('exemploAtivoInfo').textContent = 'Conteúdo editado';
     $('avisoEdicao').hidden = false;
-    $('avisoEdicaoTexto').innerHTML =
-      `Você editou <strong>${alvo}</strong>. As saídas anteriores da Máquina e do Console foram limpas ` +
-      'porque este protótipo utiliza apenas <strong>dados simulados</strong>. Carregue um exemplo cadastrado ' +
-      '(<em>Programa válido</em>, <em>Erro léxico</em> ou <em>Erro sintático</em>) acima para testar os controles.';
-
-    renderVazioMaquina(true);
-    renderConsole('SAÍDA LIMPA · MODO SIMULADO', 'edit', [
-      `[MODO SIMULADO] Edição detectada em ${alvo}: saída anterior limpa.`,
-      'Para testar "Compilar" e "Executar consulta", carregue um dos exemplos cadastrados na seção 01.'
-    ]);
-
-    setPipeline({
-      programa: { texto: 'Editado', classe: 'editado' },
-      lexico: { texto: 'Limpo', classe: '' },
-      sintatico: { texto: 'Limpo', classe: '' },
-      maquina: { texto: 'Limpa', classe: '' },
-      console: { texto: 'Limpo', classe: '' }
-    });
-
-    atualizarLinhas('editado · saída limpa');
-    atualizarCardsEstado();
+    limparSaida();
   }
 
   /* Eventos dos controles */
@@ -427,12 +336,12 @@
   $('topLimpar').addEventListener('click', limparSaida);
   $('btnRecarregarValido').addEventListener('click', () => carregarExemplo('valido'));
 
-  $('editorCodigo').addEventListener('input', () => aoEditar('codigo'));
+  $('editorCodigo').addEventListener('input', aoEditar);
   $('editorCodigo').addEventListener('scroll', () => {
     $('editorLinhas').scrollTop = $('editorCodigo').scrollTop;
   });
 
-  $('inputConsulta').addEventListener('input', () => aoEditar('consulta'));
+  $('inputConsulta').addEventListener('input', aoEditar);
   $('inputConsulta').addEventListener('keydown', e => {
     if (e.key === 'Enter') {
       e.preventDefault();
