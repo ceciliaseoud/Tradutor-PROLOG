@@ -909,6 +909,11 @@ tbody tr.row-err {
 }
 
 .estados .card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 14px 12px;
   opacity: 0.56;
   transition: opacity 0.15s ease;
 }
@@ -922,16 +927,10 @@ tbody tr.row-err {
 .state-title {
   display: inline-block;
   font-weight: 700;
-  margin-bottom: 6px;
-  padding: 2px 8px;
+  padding: 4px 10px;
   border: 2px solid var(--preto);
   border-radius: 999px;
   background: var(--papel);
-}
-
-.estados p {
-  margin: 4px 0 0;
-  font-size: 13px;
 }
 
 .lilbg { background: var(--lilas); }
@@ -939,19 +938,6 @@ tbody tr.row-err {
 .ourobg { background: var(--amareloC); }
 .coralbg { background: var(--coralC); }
 .pessegobg { background: var(--pessegoC); }
-
-/* Rodapé (Trabalho de AD) */
-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 20px 24px;
-  border-top: 3px solid var(--preto);
-  max-width: 1240px;
-  margin: 0 auto;
-}
 
 :focus-visible {
   outline: 3px solid var(--roxoP);
@@ -1007,9 +993,5 @@ footer {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
-  }
-
-  footer {
-    padding: 16px 12px;
   }
 }
