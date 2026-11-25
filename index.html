@@ -30,54 +30,89 @@
         <h2 id="sec-exemplos">01 / Exemplos cadastrados e fluxo da máquina</h2>
       </div>
 
-      <div class="card pad control-deck">
-        <div class="example-picker">
-          <span class="mono picker-label">Carregar exemplo para testar os controles</span>
-          <div class="seg example-seg" role="group" aria-label="Exemplos cadastrados de Prolog">
-            <button type="button" class="ex-btn on" data-ex="valido" aria-pressed="true">
-              <span class="ex-dot verde" aria-hidden="true"></span>
-              Programa válido
-            </button>
-            <button type="button" class="ex-btn" data-ex="erro-lexico" aria-pressed="false">
-              <span class="ex-dot ouro" aria-hidden="true"></span>
-              Erro léxico
-            </button>
-            <button type="button" class="ex-btn" data-ex="erro-sintatico" aria-pressed="false">
-              <span class="ex-dot coral" aria-hidden="true"></span>
-              Erro sintático
-            </button>
+      <div class="card pad example-picker">
+        <span class="mono picker-label">Carregar exemplo para testar os controles</span>
+        <div class="seg example-seg" role="group" aria-label="Exemplos cadastrados de Prolog">
+          <button type="button" class="ex-btn on" data-ex="valido" aria-pressed="true">
+            <span class="ex-dot verde" aria-hidden="true"></span>
+            Programa válido
+          </button>
+          <button type="button" class="ex-btn" data-ex="erro-lexico" aria-pressed="false">
+            <span class="ex-dot ouro" aria-hidden="true"></span>
+            Erro léxico
+          </button>
+          <button type="button" class="ex-btn" data-ex="erro-sintatico" aria-pressed="false">
+            <span class="ex-dot coral" aria-hidden="true"></span>
+            Erro sintático
+          </button>
+        </div>
+        <p id="exemploDesc" class="note">
+          Base genealógica válida com fatos, regra recursiva simples e consulta pronta para demonstração.
+        </p>
+      </div>
+
+      <div class="card win pipeline-box" aria-label="Fluxo conceitual do compilador conforme Aula 5">
+        <div class="win-bar bg-pessego">
+          <div class="win-title">
+            <span class="win-icon" aria-hidden="true">▸</span>
+            <span class="pipe-win-heading">Fluxo do Tradutor</span>
+            <span class="win-file mono">Aula 5: Programa → Máquina ← Consulta → Console</span>
           </div>
-          <p id="exemploDesc" class="note">
-            Base genealógica válida com fatos, regra recursiva simples e consulta pronta para demonstração.
-          </p>
+          <div class="win-controls" aria-hidden="true">
+            <span>_</span><span>□</span><span>×</span>
+          </div>
         </div>
 
-        <div class="pipeline-box" aria-label="Fluxo conceitual do compilador conforme Aula 5">
-          <span class="mono picker-label">Fluxo Aula 5: Programa → Máquina ← Consulta → Console</span>
+        <div class="pipeline-stage-area">
           <ol class="pipeline" id="pipeline">
             <li class="pipe-step" data-stage="programa">
-              <span class="mono">1. Programa</span>
-              <strong id="pipePrograma">Carregado</strong>
+              <div class="pipe-head">
+                <span class="pipe-num mono">01</span>
+                <span class="pipe-name mono">Programa</span>
+              </div>
+              <div class="pipe-body">
+                <strong id="pipePrograma" class="pipe-status mono">Carregado</strong>
+              </div>
             </li>
-            <li class="pipe-arrow" aria-hidden="true">→</li>
+            <li class="pipe-arrow" aria-hidden="true"><span>→</span></li>
             <li class="pipe-step" data-stage="lexico">
-              <span class="mono">2. Léxico</span>
-              <strong id="pipeLexico">Aguardando</strong>
+              <div class="pipe-head">
+                <span class="pipe-num mono">02</span>
+                <span class="pipe-name mono">Léxico</span>
+              </div>
+              <div class="pipe-body">
+                <strong id="pipeLexico" class="pipe-status mono">Aguardando</strong>
+              </div>
             </li>
-            <li class="pipe-arrow" aria-hidden="true">→</li>
+            <li class="pipe-arrow" aria-hidden="true"><span>→</span></li>
             <li class="pipe-step" data-stage="sintatico">
-              <span class="mono">3. Sintático</span>
-              <strong id="pipeSintatico">Aguardando</strong>
+              <div class="pipe-head">
+                <span class="pipe-num mono">03</span>
+                <span class="pipe-name mono">Sintático</span>
+              </div>
+              <div class="pipe-body">
+                <strong id="pipeSintatico" class="pipe-status mono">Aguardando</strong>
+              </div>
             </li>
-            <li class="pipe-arrow" aria-hidden="true">→</li>
+            <li class="pipe-arrow" aria-hidden="true"><span>→</span></li>
             <li class="pipe-step" data-stage="maquina">
-              <span class="mono">4. Máquina</span>
-              <strong id="pipeMaquina">Aguardando</strong>
+              <div class="pipe-head">
+                <span class="pipe-num mono">04</span>
+                <span class="pipe-name mono">Máquina</span>
+              </div>
+              <div class="pipe-body">
+                <strong id="pipeMaquina" class="pipe-status mono">Aguardando</strong>
+              </div>
             </li>
-            <li class="pipe-arrow" aria-hidden="true">→</li>
+            <li class="pipe-arrow" aria-hidden="true"><span>→</span></li>
             <li class="pipe-step" data-stage="console">
-              <span class="mono">5. Console</span>
-              <strong id="pipeConsole">Aguardando</strong>
+              <div class="pipe-head">
+                <span class="pipe-num mono">05</span>
+                <span class="pipe-name mono">Console</span>
+              </div>
+              <div class="pipe-body">
+                <strong id="pipeConsole" class="pipe-status mono">Aguardando</strong>
+              </div>
             </li>
           </ol>
         </div>
