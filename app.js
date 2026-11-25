@@ -36,6 +36,7 @@
 
   function setTag(id, texto, classe) {
     const el = $(id);
+    if (!el) return;
     el.textContent = texto;
     el.className = `tag ${classe}`;
   }
@@ -229,7 +230,6 @@
     $('inputConsulta').value = ex.consulta;
     $('editorArquivo').textContent = ex.arquivo;
     $('exemploDesc').textContent = ex.descricao;
-    $('exemploAtivoInfo').textContent = `Exemplo ativo: ${ex.titulo}`;
     $('avisoEdicao').hidden = true;
 
     botoesExemplo.forEach(btn => {
@@ -238,7 +238,6 @@
       btn.setAttribute('aria-pressed', ativo ? 'true' : 'false');
     });
 
-    setTag('statusGlobal', 'Exemplo carregado', 'lil');
     setTag('editorModo', 'Exemplo cadastrado', 'verdeC');
     setTag('maquinaTag', 'Aguardando compilação', 'creme');
     setTag('consoleTag', 'Saída simulada', 'ouro');
@@ -298,7 +297,6 @@
     $('badgeArvore').textContent = ex.arvoreBadge;
     $('badgeDiag').textContent = ex.diagnosticoBadge;
 
-    setTag('statusGlobal', ex.statusTag.texto, ex.statusTag.classe);
     setTag('maquinaTag', ex.maquinaTag.texto, ex.maquinaTag.classe);
     $('maquinaResumo').textContent = ex.maquinaResumo;
 
@@ -350,7 +348,6 @@
     estado.compilado = false;
     estado.fase = 'carregado';
 
-    setTag('statusGlobal', 'Exemplo carregado', 'lil');
     setTag('maquinaTag', 'Saída limpa', 'creme');
     setTag('consoleTag', 'Saída simulada', 'ouro');
     $('maquinaResumo').textContent = `Saídas limpas para "${ex.titulo}". Clique em Compilar para gerar novamente.`;
@@ -383,11 +380,9 @@
     });
 
     const alvo = origem === 'consulta' ? 'a consulta' : 'o código Prolog';
-    setTag('statusGlobal', 'Editado · Saída limpa', 'pessego');
     setTag('editorModo', 'Editado manualmente', 'pessego');
     setTag('maquinaTag', 'Saída limpa', 'pessego');
     setTag('consoleTag', 'Saída limpa', 'pessego');
-    $('exemploAtivoInfo').textContent = 'Exemplo ativo: nenhum (conteúdo editado)';
     $('maquinaResumo').textContent = 'Saídas anteriores limpas após edição. Carregue um exemplo cadastrado para testar os controles.';
 
     $('avisoEdicao').hidden = false;

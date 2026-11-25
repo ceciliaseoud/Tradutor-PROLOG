@@ -142,34 +142,11 @@ small,
   flex-wrap: wrap;
 }
 
-.top-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.win-glyph {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border: 3px solid var(--preto);
-  border-radius: 6px;
-  background: var(--amarelo);
-  box-shadow: 2px 2px 0 var(--preto);
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.address-bar {
-  background: var(--off);
-  border: 3px solid var(--preto);
-  border-radius: 999px;
-  padding: 5px 14px;
-  box-shadow: 2px 2px 0 var(--preto);
-  font-weight: 700;
+.top-title {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
 .top-actions {
@@ -181,14 +158,11 @@ small,
 main {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 24px 20px 56px;
+  padding: 20px 20px 56px;
 }
 
-h1 {
-  font-size: 44px;
-  line-height: 1.05;
-  margin: 4px 0 8px;
-  letter-spacing: -0.02em;
+main > section:first-child h2 {
+  margin-top: 4px;
 }
 
 h2 {
@@ -247,42 +221,6 @@ h3 {
 
 .pad {
   padding: 18px;
-}
-
-/* Hero (Trabalho de AD) */
-.hero {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 18px;
-  background: linear-gradient(135deg, var(--rosaC) 0%, var(--papel) 52%, var(--cianoC) 100%);
-  border: 3px solid var(--preto);
-  border-radius: 10px;
-  box-shadow: var(--sh);
-  padding: 20px 22px;
-}
-
-.hero-copy {
-  max-width: 720px;
-}
-
-.eyebrow {
-  margin: 0;
-  font-weight: 700;
-  color: var(--roxoP);
-}
-
-.lead {
-  margin: 0;
-  color: #24232B;
-}
-
-.hero-r {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  flex-shrink: 0;
 }
 
 /* Tags e badges pastel */
@@ -1026,16 +964,8 @@ footer {
     grid-template-columns: 1fr;
   }
 
-  .hero {
-    flex-direction: column;
-  }
-
-  .hero-r {
-    align-items: flex-start;
-  }
-
-  h1 {
-    font-size: 34px;
+  .top-title {
+    font-size: 22px;
   }
 
   .editor-shell,
@@ -1077,11 +1007,6 @@ footer {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
-  }
-
-  .address-bar {
-    font-size: 11px;
-    padding: 4px 10px;
   }
 
   footer {
