@@ -871,6 +871,56 @@ tbody tr.row-err {
   outline-offset: 2px;
 }
 
+/* Scrollbars personalizadas no estilo Web Retrô */
+*::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--creme);
+  border-left: 2px solid var(--preto);
+}
+
+*::-webkit-scrollbar-track:horizontal {
+  border-left: 0;
+  border-top: 2px solid var(--preto);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--roxo);
+  border: 2px solid var(--preto);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--amarelo);
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: var(--rosa);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--amarelo);
+  border-top: 2px solid var(--preto);
+  border-left: 2px solid var(--preto);
+}
+
+.win-editor *::-webkit-scrollbar-thumb { background: var(--amarelo); }
+.win-editor *::-webkit-scrollbar-thumb:hover { background: var(--pessego); }
+.win-maquina *::-webkit-scrollbar-thumb { background: var(--roxo); }
+.win-maquina *::-webkit-scrollbar-thumb:hover { background: var(--rosa); }
+.win-console *::-webkit-scrollbar-thumb { background: var(--ciano); }
+.win-console *::-webkit-scrollbar-thumb:hover { background: var(--verde); }
+
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--roxo) var(--creme);
+  }
+}
+
 @media (max-width: 900px) {
   .ide-grid {
     grid-template-columns: 1fr;
