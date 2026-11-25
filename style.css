@@ -581,6 +581,8 @@ h3 {
   font-size: 14px;
   line-height: 23px;
   tab-size: 4;
+  white-space: pre;
+  overflow-x: auto;
 }
 
 .code-input:focus {
@@ -662,7 +664,7 @@ h3 {
   border: 3px solid var(--preto);
   border-radius: 6px;
   background: var(--papel);
-  max-height: 310px;
+  max-height: 390px;
   overflow: auto;
 }
 
@@ -795,10 +797,10 @@ tbody tr.row-err {
 }
 
 .diag-box {
-  padding: 14px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .diag-header {
@@ -892,7 +894,9 @@ tbody tr.row-err {
 .query-prompt {
   display: inline-flex;
   align-items: center;
-  padding: 0 11px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 0 12px;
   background: var(--rosaC);
   border-right: 3px solid var(--preto);
   font-weight: 700;
@@ -915,7 +919,7 @@ tbody tr.row-err {
 /* Console retrô pastel */
 .console-screen {
   min-height: 150px;
-  max-height: 240px;
+  max-height: 290px;
   overflow: auto;
   padding: 12px 14px;
   border: 3px solid var(--preto);
@@ -1036,11 +1040,14 @@ footer {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 720px) {
   .top {
+    position: static;
     padding: 10px 14px;
   }
+}
 
+@media (max-width: 600px) {
   main {
     padding: 16px 12px 44px;
   }
