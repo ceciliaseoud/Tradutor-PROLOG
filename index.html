@@ -28,7 +28,6 @@
     <section aria-labelledby="sec-exemplos">
       <div class="rowhead">
         <h2 id="sec-exemplos">01 / Exemplos cadastrados e fluxo da máquina</h2>
-        <span class="tag pessego">Protótipo estático</span>
       </div>
 
       <div class="card pad control-deck">
@@ -100,7 +99,6 @@
     <section id="ide" aria-labelledby="sec-ide">
       <div class="rowhead">
         <h2 id="sec-ide">02 / Ambiente de Programação (IDE)</h2>
-        <span class="mono">Esquerda: Editor Prolog · Direita: Máquina, Consulta e Console</span>
       </div>
 
       <div class="ide-grid">
@@ -133,7 +131,6 @@
               autocorrect="off"
               autocapitalize="off"
               rows="16"
-              aria-describedby="editorAjuda"
             ></textarea>
           </div>
 
@@ -142,9 +139,6 @@
               <button id="btnCompilar" type="button" class="b verde">Compilar</button>
               <button id="btnLimpar" type="button" class="b creme">Limpar saída</button>
             </div>
-            <p id="editorAjuda" class="note">
-              Editar o código limpa as saídas simuladas e solicita o carregamento de um exemplo.
-            </p>
           </footer>
         </article>
 
@@ -250,15 +244,11 @@
                     class="mono"
                     spellcheck="false"
                     autocomplete="off"
-                    aria-describedby="consultaAjuda"
                     placeholder="Ex.: avo(joao, Neto)."
                   >
                 </div>
                 <button id="btnExecutar" type="button" class="b rosa">Executar consulta</button>
               </div>
-              <p id="consultaAjuda" class="note">
-                A resposta exibida no console é simulada e corresponde ao exemplo carregado. Editar a consulta limpa a saída.
-              </p>
             </div>
           </article>
 
