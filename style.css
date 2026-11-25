@@ -127,32 +127,27 @@ small,
   border-top: 3px solid var(--preto);
 }
 
-/* Barra superior fixa (estilo Trabalho de AD + barra de navegador retrô) */
-.top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 14px;
-  padding: 10px 24px;
-  background: var(--papel);
-  border-bottom: 3px solid var(--preto);
+/* Hero simples fixo no topo */
+.hero-top {
   position: sticky;
   top: 0;
   z-index: 10;
-  flex-wrap: wrap;
+  background: linear-gradient(135deg, var(--rosaC) 0%, var(--papel) 52%, var(--cianoC) 100%);
+  border-bottom: 3px solid var(--preto);
+  box-shadow: 0 4px 0 var(--preto);
 }
 
-.top-title {
+.hero-top-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 14px 20px;
+}
+
+.hero-title {
   margin: 0;
-  font-size: 26px;
+  font-size: 32px;
   line-height: 1.1;
   letter-spacing: -0.02em;
-}
-
-.top-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
 }
 
 main {
@@ -832,8 +827,8 @@ tbody tr.row-err {
     grid-template-columns: 1fr;
   }
 
-  .top-title {
-    font-size: 22px;
+  .hero-title {
+    font-size: 26px;
   }
 
   .editor-shell,
@@ -842,25 +837,17 @@ tbody tr.row-err {
   }
 }
 
-@media (max-width: 720px) {
-  .top {
-    position: static;
-    padding: 10px 14px;
-  }
-}
-
 @media (max-width: 600px) {
+  .hero-top-inner {
+    padding: 12px 14px;
+  }
+
+  .hero-title {
+    font-size: 23px;
+  }
+
   main {
     padding: 16px 12px 44px;
-  }
-
-  .top-actions {
-    width: 100%;
-  }
-
-  .top-actions .b {
-    flex: 1 1 auto;
-    text-align: center;
   }
 
   .consulta-row {

@@ -312,11 +312,8 @@
   });
 
   $('btnCompilar').addEventListener('click', compilar);
-  $('topCompilar').addEventListener('click', compilar);
   $('btnExecutar').addEventListener('click', executarConsulta);
-  $('topExecutar').addEventListener('click', executarConsulta);
   $('btnLimpar').addEventListener('click', limparSaida);
-  $('topLimpar').addEventListener('click', limparSaida);
 
   $('editorCodigo').addEventListener('input', aoEditar);
   $('editorCodigo').addEventListener('scroll', () => {
