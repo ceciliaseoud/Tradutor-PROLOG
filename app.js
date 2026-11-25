@@ -1,11 +1,10 @@
-/* Controlador da interface simulada do Tradutor Prolog (Item 4). */
+/* Controlador da interface do Tradutor PROLOG. */
 (function () {
   const $ = id => document.getElementById(id);
   const EXEMPLOS = window.EXEMPLOS_PROLOG || {};
 
   const estado = {
-    exemploId: 'valido',
-    fase: 'carregado',
+    exemploId: 'personalizado',
     compilado: false,
     abaAtiva: 'tokens'
   };
@@ -22,7 +21,7 @@
       .replace(/'/g, '&#39;');
   }
 
-  function atualizarLinhas(notaExtra) {
+  function atualizarLinhas() {
     const texto = $('editorCodigo').value;
     const total = Math.max(1, texto.split('\n').length);
     let numeros = '';
@@ -30,8 +29,7 @@
       numeros += i === total ? String(i) : `${i}\n`;
     }
     $('editorLinhas').textContent = numeros;
-    const sufixo = notaExtra || (estado.exemploId ? 'sem erros exibidos' : 'aguardando exemplo');
-    $('editorMeta').textContent = `${total} ${total === 1 ? 'linha' : 'linhas'} · ${sufixo}`;
+    $('editorMeta').textContent = `${total} ${total === 1 ? 'linha' : 'linhas'}`;
   }
 
   function setTag(id, texto, classe) {
@@ -41,27 +39,11 @@
     el.className = `tag ${classe}`;
   }
 
-  function setPipeline(mapa) {
-    const chaves = [
-      ['programa', 'pipePrograma'],
-      ['lexico', 'pipeLexico'],
-      ['sintatico', 'pipeSintatico'],
-      ['maquina', 'pipeMaquina'],
-      ['console', 'pipeConsole']
-    ];
-    for (const [stage, outId] of chaves) {
-      const cfg = mapa[stage] || { texto: 'Aguardando', classe: '' };
-      const item = document.querySelector(`.pipe-step[data-stage="${stage}"]`);
-      if (item) {
-        item.className = `pipe-step${cfg.classe ? ' ' + cfg.classe : ''}`;
-      }
-      $(outId).textContent = cfg.texto;
-    }
-  }
-
-  function atualizarCardsEstado() {
-    document.querySelectorAll('#estados [data-e]').forEach(card => {
-      card.classList.toggle('atual', card.dataset.e === estado.fase);
+  function marcarBotaoExemplo(id) {
+    botoesExemplo.forEach(btn => {
+      const ativo = btn.dataset.ex === id;
+      btn.classList.toggle('on', ativo);
+      btn.setAttribute('aria-pressed', ativo ? 'true' : 'false');
     });
   }
 
@@ -84,23 +66,13 @@
       `<pre class="console-lines">${esc(linhas.join('\n'))}</pre>`;
   }
 
-  function renderVazioMaquina(modoEditado) {
+  function renderVazioMaquina(mensagem) {
     $('badgeTokens').textContent = '0';
     $('badgeSimbolos').textContent = '0';
     $('badgeArvore').textContent = '–';
     $('badgeDiag').textContent = '–';
 
-    const bloco = modoEditado
-      ? `<div class="panel-empty edit-state">
-           <span class="tag pessego">Saída anterior limpa</span>
-           <p>O código ou a consulta foi editado manualmente. Este protótipo trabalha apenas com <strong>resultados simulados</strong> para cenários cadastrados.</p>
-           <p><strong>Próximo passo:</strong> carregue <em>Programa válido</em>, <em>Erro léxico</em> ou <em>Erro sintático</em> na seção 01 para testar <strong>Compilar</strong> e <strong>Executar consulta</strong>.</p>
-         </div>`
-      : `<div class="panel-empty">
-           <span class="tag lil">Aguardando compilação simulada</span>
-           <p>Clique em <strong>Compilar</strong> para preencher tokens, tabela de símbolos, árvore de derivação e diagnóstico do exemplo carregado.</p>
-         </div>`;
-
+    const bloco = `<div class="panel-empty"><p>${esc(mensagem || 'Aguardando compilação.')}</p></div>`;
     $('panel-tokens').innerHTML = bloco;
     $('panel-simbolos').innerHTML = bloco;
     $('panel-arvore').innerHTML = bloco;
@@ -178,7 +150,7 @@
     if (!ex.arvore) {
       $('panel-arvore').innerHTML = `
         <div class="panel-empty">
-          <span class="tag ouro">Árvore não gerada (simulado)</span>
+          <span class="tag ouro">Indisponível</span>
           <p>${esc(ex.arvoreIndisponivel)}</p>
         </div>
       `;
@@ -188,7 +160,7 @@
     $('panel-arvore').innerHTML = `
       <div class="tree-wrap">
         <div class="tree-meta">
-          <span class="tag lil">GLC simplificada · Simulado</span>
+          <span class="tag lil">GLC</span>
           <span class="mono">${esc(ex.arvore.resumo)}</span>
         </div>
         <ul class="tree-list">
@@ -204,7 +176,7 @@
       <div class="diag-box">
         <div class="diag-header ${esc(diag.tipo)}">
           <strong>${esc(diag.titulo)}</strong>
-          <span class="tag ${badgeClasse}">${esc(diag.codigo)} · Simulado</span>
+          <span class="tag ${badgeClasse}">${esc(diag.codigo)}</span>
         </div>
         <div class="diag-grid">
           <div class="diag-kv"><span>Etapa</span><strong>${esc(diag.fase)}</strong></div>
@@ -213,79 +185,76 @@
         </div>
         <p class="note" style="margin:0;color:var(--preto);font-size:13px">${esc(diag.mensagem)}</p>
         <pre class="diag-snippet">${esc(diag.trecho)}</pre>
-        <p class="diag-hint"><strong>Orientação:</strong> ${esc(diag.sugestao)}</p>
+        <p class="diag-hint"><strong>Sugestão:</strong> ${esc(diag.sugestao)}</p>
       </div>
     `;
   }
 
+  function ativarPersonalizado(limparCampos, focarEditor) {
+    estado.exemploId = 'personalizado';
+    estado.compilado = false;
+
+    if (limparCampos) {
+      $('editorCodigo').value = '';
+      $('inputConsulta').value = '';
+    }
+
+    $('editorArquivo').textContent = 'personalizado.pl';
+    marcarBotaoExemplo('personalizado');
+    setTag('editorModo', 'Personalizado', 'lil');
+    setTag('maquinaTag', 'Aguardando', 'creme');
+    setTag('consoleTag', 'Pronto', 'creme');
+
+    renderVazioMaquina('Escreva um código Prolog no editor ou escolha um exemplo.');
+    selecionarAba('tokens', false);
+    renderConsole('PRONTO', 'edit', ['Modo personalizado ativo.']);
+    atualizarLinhas();
+
+    if (focarEditor) $('editorCodigo').focus();
+  }
+
   function carregarExemplo(id) {
+    if (id === 'personalizado') {
+      ativarPersonalizado(true, true);
+      return;
+    }
+
     const ex = EXEMPLOS[id];
     if (!ex) return;
 
     estado.exemploId = id;
-    estado.fase = 'carregado';
     estado.compilado = false;
 
     $('editorCodigo').value = ex.codigo;
     $('inputConsulta').value = ex.consulta;
     $('editorArquivo').textContent = ex.arquivo;
-    $('exemploDesc').textContent = ex.descricao;
-    $('avisoEdicao').hidden = true;
+    marcarBotaoExemplo(id);
 
-    botoesExemplo.forEach(btn => {
-      const ativo = btn.dataset.ex === id;
-      btn.classList.toggle('on', ativo);
-      btn.setAttribute('aria-pressed', ativo ? 'true' : 'false');
-    });
+    setTag('editorModo', 'Exemplo', 'verdeC');
+    setTag('maquinaTag', 'Aguardando', 'creme');
+    setTag('consoleTag', 'Pronto', 'creme');
 
-    setTag('editorModo', 'Exemplo cadastrado', 'verdeC');
-    setTag('maquinaTag', 'Aguardando compilação', 'creme');
-    setTag('consoleTag', 'Saída simulada', 'ouro');
-    $('maquinaResumo').textContent = `Exemplo "${ex.titulo}" pronto. Clique em Compilar para gerar as saídas simuladas.`;
-
-    renderVazioMaquina(false);
+    renderVazioMaquina('Clique em Compilar para analisar o programa.');
     selecionarAba('tokens', false);
-
-    renderConsole('SAÍDA SIMULADA · PRONTO', 'edit', [
-      `[SIMULAÇÃO] Exemplo "${ex.titulo}" (${ex.arquivo}) carregado no Editor Prolog.`,
-      `Consulta pronta: ?- ${ex.consulta}`,
-      'Clique em "Compilar" para inspecionar a Máquina ou em "Executar consulta" para ver a saída cadastrada.'
-    ]);
-
-    setPipeline({
-      programa: { texto: 'Carregado', classe: 'ativo' },
-      lexico: { texto: 'Aguardando', classe: '' },
-      sintatico: { texto: 'Aguardando', classe: '' },
-      maquina: { texto: 'Aguardando', classe: '' },
-      console: { texto: 'Aguardando', classe: '' }
-    });
-
-    atualizarLinhas('pronto para compilar');
-    atualizarCardsEstado();
-  }
-
-  function orientarEdicao(acao) {
-    $('avisoEdicao').hidden = false;
-    $('avisoEdicaoTexto').innerHTML =
-      `Não foi possível executar <strong>${esc(acao)}</strong> porque o código ou a consulta foi editado manualmente. ` +
-      'Esta interface demonstra apenas <strong>saídas simuladas</strong> de exemplos cadastrados — carregue ' +
-      '<strong>Programa válido</strong>, <strong>Erro léxico</strong> ou <strong>Erro sintático</strong> acima para testar os controles.';
-
-    renderConsole('SAÍDA SIMULADA · CARREGUE UM EXEMPLO', 'edit', [
-      `[MODO SIMULADO] Ação "${acao}" indisponível para texto editado manualmente.`,
-      'Carregue um dos exemplos cadastrados (Programa válido, Erro léxico ou Erro sintático) na seção 01 para testar os controles.'
-    ]);
+    renderConsole('PRONTO', 'edit', [`${ex.arquivo} carregado.`]);
+    atualizarLinhas();
   }
 
   function compilar() {
-    if (!estado.exemploId) {
-      orientarEdicao('Compilar');
+    if (estado.exemploId === 'personalizado') {
+      const vazio = !$('editorCodigo').value.trim();
+      const msg = vazio
+        ? 'Escreva um código Prolog no editor antes de compilar.'
+        : 'Compilação de código personalizado ainda não integrada ao motor.';
+      setTag('maquinaTag', vazio ? 'Editor vazio' : 'Pendente', 'pessego');
+      setTag('consoleTag', 'Aviso', 'pessego');
+      renderVazioMaquina(msg);
+      renderConsole('PERSONALIZADO', 'edit', [msg]);
       return;
     }
 
     const ex = EXEMPLOS[estado.exemploId];
     estado.compilado = true;
-    estado.fase = ex.estadoCompilado;
 
     renderTokens(ex.tokens);
     renderSimbolos(ex.simbolos);
@@ -298,115 +267,43 @@
     $('badgeDiag').textContent = ex.diagnosticoBadge;
 
     setTag('maquinaTag', ex.maquinaTag.texto, ex.maquinaTag.classe);
-    $('maquinaResumo').textContent = ex.maquinaResumo;
-
-    setTag(
-      'consoleTag',
-      ex.id === 'valido' ? 'Compilado · Simulado' : 'Erro · Simulado',
-      ex.id === 'valido' ? 'verde' : 'coral'
-    );
+    setTag('consoleTag', ex.id === 'valido' ? 'OK' : 'Erro', ex.id === 'valido' ? 'verde' : 'coral');
 
     renderConsole(ex.consoleCompilar.banner, ex.consoleCompilar.bannerClasse, ex.consoleCompilar.linhas);
-    setPipeline(ex.pipeline);
     selecionarAba(ex.abaInicial, false);
-
-    const metaNota = ex.id === 'valido' ? '0 erros (simulado)' : `${ex.diagnostico.codigo} marcado (simulado)`;
-    atualizarLinhas(metaNota);
-    atualizarCardsEstado();
   }
 
   function executarConsulta() {
-    if (!estado.exemploId) {
-      orientarEdicao('Executar consulta');
+    if (estado.exemploId === 'personalizado') {
+      const consulta = $('inputConsulta').value.trim();
+      const msg = consulta
+        ? 'Execução de consulta personalizada ainda não integrada ao motor.'
+        : 'Informe uma consulta antes de executar.';
+      setTag('consoleTag', 'Aviso', 'pessego');
+      renderConsole('PERSONALIZADO', 'edit', consulta ? [`?- ${consulta}`, msg] : [msg]);
       return;
     }
 
     const ex = EXEMPLOS[estado.exemploId];
-    const linhas = ex.consoleConsulta.linhas.slice();
-    if (!estado.compilado) {
-      linhas.push('', 'Dica: clique em "Compilar" para inspecionar tokens, símbolos, árvore e diagnóstico na Máquina.');
-    }
-
-    renderConsole(ex.consoleConsulta.banner, ex.consoleConsulta.bannerClasse, linhas);
-
     const ok = ex.id === 'valido';
-    setTag('consoleTag', ok ? 'Resposta simulada' : 'Bloqueada · Simulado', ok ? 'verde' : 'coral');
-
-    const stepConsole = document.querySelector('.pipe-step[data-stage="console"]');
-    if (stepConsole) {
-      stepConsole.className = `pipe-step ${ok ? 'ok' : 'erro'}`;
-    }
-    $('pipeConsole').textContent = ok ? '2 soluções' : 'Bloqueada';
+    setTag('consoleTag', ok ? 'OK' : 'Bloqueada', ok ? 'verde' : 'coral');
+    renderConsole(ex.consoleConsulta.banner, ex.consoleConsulta.bannerClasse, ex.consoleConsulta.linhas);
   }
 
   function limparSaida() {
-    if (!estado.exemploId) {
-      aoEditar('manual');
-      return;
-    }
-    const ex = EXEMPLOS[estado.exemploId];
     estado.compilado = false;
-    estado.fase = 'carregado';
-
-    setTag('maquinaTag', 'Saída limpa', 'creme');
-    setTag('consoleTag', 'Saída simulada', 'ouro');
-    $('maquinaResumo').textContent = `Saídas limpas para "${ex.titulo}". Clique em Compilar para gerar novamente.`;
-
-    renderVazioMaquina(false);
-    renderConsole('SAÍDA SIMULADA · LIMPA', 'edit', [
-      `[SIMULAÇÃO] Saídas anteriores limpas. O exemplo "${ex.titulo}" continua carregado no editor.`,
-      'Clique em "Compilar" ou "Executar consulta" para visualizar os dados simulados.'
-    ]);
-
-    setPipeline({
-      programa: { texto: 'Carregado', classe: 'ativo' },
-      lexico: { texto: 'Aguardando', classe: '' },
-      sintatico: { texto: 'Aguardando', classe: '' },
-      maquina: { texto: 'Aguardando', classe: '' },
-      console: { texto: 'Limpo', classe: '' }
-    });
-    atualizarLinhas('saída limpa');
-    atualizarCardsEstado();
+    setTag('maquinaTag', 'Aguardando', 'creme');
+    setTag('consoleTag', 'Pronto', 'creme');
+    renderVazioMaquina('Saída limpa.');
+    renderConsole('CONSOLE', 'edit', ['Saída limpa.']);
   }
 
-  function aoEditar(origem) {
-    estado.exemploId = null;
-    estado.fase = 'editado';
-    estado.compilado = false;
-
-    botoesExemplo.forEach(btn => {
-      btn.classList.remove('on');
-      btn.setAttribute('aria-pressed', 'false');
-    });
-
-    const alvo = origem === 'consulta' ? 'a consulta' : 'o código Prolog';
-    setTag('editorModo', 'Editado manualmente', 'pessego');
-    setTag('maquinaTag', 'Saída limpa', 'pessego');
-    setTag('consoleTag', 'Saída limpa', 'pessego');
-    $('maquinaResumo').textContent = 'Saídas anteriores limpas após edição. Carregue um exemplo cadastrado para testar os controles.';
-
-    $('avisoEdicao').hidden = false;
-    $('avisoEdicaoTexto').innerHTML =
-      `Você editou <strong>${alvo}</strong>. As saídas anteriores da Máquina e do Console foram limpas ` +
-      'porque este protótipo utiliza apenas <strong>dados simulados</strong>. Carregue um exemplo cadastrado ' +
-      '(<em>Programa válido</em>, <em>Erro léxico</em> ou <em>Erro sintático</em>) acima para testar os controles.';
-
-    renderVazioMaquina(true);
-    renderConsole('SAÍDA LIMPA · MODO SIMULADO', 'edit', [
-      `[MODO SIMULADO] Edição detectada em ${alvo}: saída anterior limpa.`,
-      'Para testar "Compilar" e "Executar consulta", carregue um dos exemplos cadastrados na seção 01.'
-    ]);
-
-    setPipeline({
-      programa: { texto: 'Editado', classe: 'editado' },
-      lexico: { texto: 'Limpo', classe: '' },
-      sintatico: { texto: 'Limpo', classe: '' },
-      maquina: { texto: 'Limpa', classe: '' },
-      console: { texto: 'Limpo', classe: '' }
-    });
-
-    atualizarLinhas('editado · saída limpa');
-    atualizarCardsEstado();
+  function aoEditar() {
+    if (estado.exemploId !== 'personalizado' || estado.compilado) {
+      ativarPersonalizado(false, false);
+    } else {
+      atualizarLinhas();
+    }
   }
 
   /* Eventos dos controles */
@@ -420,14 +317,13 @@
   $('topExecutar').addEventListener('click', executarConsulta);
   $('btnLimpar').addEventListener('click', limparSaida);
   $('topLimpar').addEventListener('click', limparSaida);
-  $('btnRecarregarValido').addEventListener('click', () => carregarExemplo('valido'));
 
-  $('editorCodigo').addEventListener('input', () => aoEditar('codigo'));
+  $('editorCodigo').addEventListener('input', aoEditar);
   $('editorCodigo').addEventListener('scroll', () => {
     $('editorLinhas').scrollTop = $('editorCodigo').scrollTop;
   });
 
-  $('inputConsulta').addEventListener('input', () => aoEditar('consulta'));
+  $('inputConsulta').addEventListener('input', aoEditar);
   $('inputConsulta').addEventListener('keydown', e => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -451,6 +347,6 @@
     });
   });
 
-  /* Estado inicial */
-  carregarExemplo('valido');
+  /* Estado inicial: Personalizado pronto para escrever ou escolher um exemplo */
+  ativarPersonalizado(true, false);
 })();
