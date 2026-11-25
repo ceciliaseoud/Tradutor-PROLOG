@@ -1,12 +1,11 @@
-/* Controlador da interface do Tradutor PROLOG. */
+/* Controlador da interface do Tradutor PROLOG conectado ao backend local. */
 (function () {
   const $ = id => document.getElementById(id);
   const EXEMPLOS = window.EXEMPLOS_PROLOG || {};
 
   const estado = {
     exemploId: 'personalizado',
-    compilado: false,
-    abaAtiva: 'tokens',
+    requisicao: 0,
     linhasErro: []
   };
 
@@ -25,8 +24,13 @@
   function atualizarLinhas() {
     const texto = $('editorCodigo').value;
     const total = Math.max(1, texto.split('\n').length);
-    const erros = new Set(estado.linhasErro);
-    const primeiraErro = estado.linhasErro.length ? estado.linhasErro[0] : -1;
+    const errosNormalizados = [...new Set(
+      estado.linhasErro
+        .filter(n => Number.isInteger(n) && n >= 1)
+        .map(n => Math.min(n, total))
+    )].sort((a, b) => a - b);
+    const erros = new Set(errosNormalizados);
+    const primeiraErro = errosNormalizados.length ? errosNormalizados[0] : -1;
 
     let gutterHtml = '';
     let backdropHtml = '';
@@ -55,16 +59,15 @@
     botoesExemplo.forEach(btn => {
       const ativo = btn.dataset.ex === id;
       btn.classList.toggle('on', ativo);
-      btn.setAttribute('aria-pressed', ativo ? 'true' : 'false');
+      btn.setAttribute('aria-pressed', String(ativo));
     });
   }
 
   function selecionarAba(nomeAba, focar) {
-    estado.abaAtiva = nomeAba;
     abas.forEach(btn => {
       const ativa = btn.dataset.tab === nomeAba;
       btn.classList.toggle('on', ativa);
-      btn.setAttribute('aria-selected', ativa ? 'true' : 'false');
+      btn.setAttribute('aria-selected', String(ativa));
       btn.tabIndex = ativa ? 0 : -1;
       const painel = $(btn.getAttribute('aria-controls'));
       if (painel) painel.hidden = !ativa;
@@ -92,15 +95,27 @@
   }
 
   function renderTokens(tokens) {
-    const linhas = tokens.map(t => `
-      <tr class="${t.erro ? 'row-err' : ''}">
-        <td>${t.n}</td>
+    const classes = {
+      atomo: ['Átomo', 'ok'],
+      atomo_citado: ['Átomo entre aspas', 'ok'],
+      variavel: ['Variável', 'var'],
+      inteiro: ['Inteiro', 'ok'],
+      decimal: ['Decimal', 'ok'],
+      operador: ['Operador', 'op'],
+      delimitador: ['Delimitador', 'delim']
+    };
+    const linhas = tokens.map((t, i) => {
+      const [classe, cor] = classes[t.classe] || ['Inválido', 'err'];
+      return `
+      <tr class="${cor === 'err' ? 'row-err' : ''}">
+        <td>${i + 1}</td>
         <td><strong>${esc(t.lexema)}</strong></td>
-        <td><span class="tok-chip ${esc(t.tipo)}">${esc(t.classe)}</span></td>
-        <td>${esc(t.pos)}</td>
-        <td>${esc(t.sym)}</td>
+        <td><span class="tok-chip ${cor}">${classe}</span></td>
+        <td>${t.linha}:${t.coluna}</td>
+        <td>${esc(t.simbolo ?? '–')}</td>
       </tr>
-    `).join('');
+    `;
+    }).join('');
 
     $('panel-tokens').innerHTML = `
       <div class="tabela">
@@ -126,8 +141,8 @@
         <td><strong>${esc(s.id)}</strong></td>
         <td>${esc(s.lexema)}</td>
         <td><span class="tok-chip ${s.categoria === 'Variável' ? 'var' : 'ok'}">${esc(s.categoria)}</span></td>
-        <td>${esc(s.detalhe)}</td>
-        <td>${esc(s.linhas)}</td>
+        <td>${s.ocorrencias}</td>
+        <td>${s.linhas.join(', ')}</td>
       </tr>
     `).join('');
 
@@ -139,7 +154,7 @@
               <th>ID</th>
               <th>Lexema</th>
               <th>Categoria</th>
-              <th>Detalhe</th>
+              <th>Ocorrências</th>
               <th>Linhas</th>
             </tr>
           </thead>
@@ -151,19 +166,18 @@
 
   function renderNoArvore(no) {
     const tipoClasse = no.tipo ? ` ${esc(no.tipo)}` : '';
-    const nota = no.nota ? `<small>(${esc(no.nota)})</small>` : '';
     const filhos = Array.isArray(no.filhos) && no.filhos.length
       ? `<ul>${no.filhos.map(renderNoArvore).join('')}</ul>`
       : '';
-    return `<li><span class="tree-node${tipoClasse}">${esc(no.rotulo)}${nota}</span>${filhos}</li>`;
+    return `<li><span class="tree-node${tipoClasse}">${esc(no.rotulo)}</span>${filhos}</li>`;
   }
 
-  function renderArvore(ex) {
-    if (!ex.arvore) {
+  function renderArvore(arvore) {
+    if (!arvore) {
       $('panel-arvore').innerHTML = `
         <div class="panel-empty">
           <span class="tag ouro">Indisponível</span>
-          <p>${esc(ex.arvoreIndisponivel)}</p>
+          <p>Corrija os erros léxicos para gerar a árvore sintática.</p>
         </div>
       `;
       return;
@@ -171,39 +185,40 @@
 
     $('panel-arvore').innerHTML = `
       <div class="tree-wrap">
-        <div class="tree-meta">
-          <span class="tag lil">GLC</span>
-          <span class="mono">${esc(ex.arvore.resumo)}</span>
-        </div>
-        <ul class="tree-list">
-          ${renderNoArvore(ex.arvore.raiz)}
-        </ul>
+        <ul class="tree-list">${renderNoArvore(arvore)}</ul>
       </div>
     `;
   }
 
-  function renderDiagnostico(diag) {
-    const badgeClasse = diag.tipo === 'ok' ? 'verde' : diag.tipo === 'lex' ? 'ouro' : 'coral';
-    $('panel-diagnostico').innerHTML = `
+  function renderDiagnosticos(diagnosticos, fonte) {
+    if (!diagnosticos.length) {
+      $('panel-diagnostico').innerHTML =
+        '<div class="diag-box"><div class="diag-header ok"><strong>Programa analisado sem erros.</strong></div></div>';
+      return;
+    }
+    const linhas = fonte.split(/\r\n?|\n/);
+    $('panel-diagnostico').innerHTML = diagnosticos.map(d => {
+      const linha = linhas[d.linha - 1] ?? '';
+      const marcador = [...linha].slice(0, Math.max(0, d.coluna - 1)).map(c => c === '\t' ? '\t' : ' ').join('');
+      const lexico = d.fase === 'léxica';
+      return `
       <div class="diag-box">
-        <div class="diag-header ${esc(diag.tipo)}">
-          <strong>${esc(diag.titulo)}</strong>
-          <span class="tag ${badgeClasse}">${esc(diag.codigo)}</span>
+        <div class="diag-header ${lexico ? 'lex' : 'sin'}">
+          <strong>${esc(d.mensagem)}</strong>
+          <span class="tag ${lexico ? 'ouro' : 'coral'}">${d.linha}:${d.coluna}</span>
         </div>
         <div class="diag-grid">
-          <div class="diag-kv"><span>Etapa</span><strong>${esc(diag.fase)}</strong></div>
-          <div class="diag-kv"><span>Localização</span><strong>${esc(diag.local)}</strong></div>
-          <div class="diag-kv"><span>Elemento</span><strong>${esc(diag.lexema)}</strong></div>
+          <div class="diag-kv"><span>Etapa</span><strong>${lexico ? 'Análise Léxica' : 'Análise Sintática'}</strong></div>
+          <div class="diag-kv"><span>Localização</span><strong>Linha ${d.linha}, Coluna ${d.coluna}</strong></div>
+          <div class="diag-kv"><span>Elemento</span><strong>${esc(d.lexema || 'fim do arquivo')}</strong></div>
         </div>
-        <p class="note" style="margin:0;color:var(--preto);font-size:13px">${esc(diag.mensagem)}</p>
-        <pre class="diag-snippet">${esc(diag.trecho)}</pre>
-      </div>
-    `;
+        <pre class="diag-snippet">${esc(`${d.linha} | ${linha}\n${' '.repeat(String(d.linha).length + 3)}${marcador}^`)}</pre>
+      </div>`;
+    }).join('');
   }
 
   function ativarPersonalizado(limparCampos, focarEditor) {
     estado.exemploId = 'personalizado';
-    estado.compilado = false;
     estado.linhasErro = [];
 
     if (limparCampos) {
@@ -214,13 +229,8 @@
     $('editorArquivo').textContent = 'personalizado.pl';
     marcarBotaoExemplo('personalizado');
     setTag('editorModo', 'Personalizado', 'lil');
-    setTag('maquinaTag', 'Aguardando', 'creme');
-    setTag('consoleTag', 'Pronto', 'creme');
-
-    renderVazioMaquina('Escreva um código Prolog no editor ou escolha um exemplo.');
+    limparSaida('Escreva um código Prolog no editor ou escolha um exemplo.', 'Modo personalizado ativo.');
     selecionarAba('tokens', false);
-    renderConsole('PRONTO', 'edit', ['Modo personalizado ativo.']);
-    atualizarLinhas();
 
     if (focarEditor) $('editorCodigo').focus();
   }
@@ -235,89 +245,135 @@
     if (!ex) return;
 
     estado.exemploId = id;
-    estado.compilado = false;
     estado.linhasErro = [];
-
     $('editorCodigo').value = ex.codigo;
     $('inputConsulta').value = ex.consulta;
     $('editorArquivo').textContent = ex.arquivo;
     marcarBotaoExemplo(id);
-
     setTag('editorModo', 'Exemplo', 'verdeC');
-    setTag('maquinaTag', 'Aguardando', 'creme');
-    setTag('consoleTag', 'Pronto', 'creme');
-
-    renderVazioMaquina('Clique em Compilar para analisar o programa.');
+    limparSaida('Clique em Compilar para analisar o programa.', `${ex.arquivo} carregado.`);
     selecionarAba('tokens', false);
-    renderConsole('PRONTO', 'edit', [`${ex.arquivo} carregado.`]);
-    atualizarLinhas();
   }
 
-  function compilar() {
-    if (estado.exemploId === 'personalizado') {
-      const vazio = !$('editorCodigo').value.trim();
-      const msg = vazio
-        ? 'Escreva um código Prolog no editor antes de compilar.'
-        : 'Compilação de código personalizado ainda não integrada ao motor.';
-      setTag('maquinaTag', vazio ? 'Editor vazio' : 'Pendente', 'pessego');
+  async function enviar(rota, dados) {
+    const requisicao = ++estado.requisicao;
+    try {
+      const resposta = await fetch(rota, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+      });
+      const resultado = await resposta.json();
+      if (!resposta.ok) throw new Error(resultado.erro);
+      return requisicao === estado.requisicao ? resultado : null;
+    } catch (falha) {
+      if (requisicao !== estado.requisicao) return null;
+      const mensagem = falha instanceof TypeError
+        ? 'Inicie o servidor com node server.js e abra http://127.0.0.1:3000.'
+        : falha.message;
+      setTag('consoleTag', 'Erro', 'coral');
+      renderConsole('ERRO NA REQUISIÇÃO', 'err', [mensagem]);
+      return null;
+    }
+  }
+
+  async function compilar() {
+    const codigo = $('editorCodigo').value;
+    if (!codigo.trim()) {
+      estado.linhasErro = [];
+      atualizarLinhas();
+      setTag('maquinaTag', 'Editor vazio', 'pessego');
       setTag('consoleTag', 'Aviso', 'pessego');
-      renderVazioMaquina(msg);
-      renderConsole('PERSONALIZADO', 'edit', [msg]);
+      renderVazioMaquina('Escreva um código Prolog no editor antes de compilar.');
+      renderConsole('AVISO', 'edit', ['Escreva um código Prolog no editor antes de compilar.']);
       return;
     }
 
-    const ex = EXEMPLOS[estado.exemploId];
-    estado.compilado = true;
-    estado.linhasErro = Array.isArray(ex.erroLinhas) ? ex.erroLinhas.slice() : [];
+    const resultado = await enviar('/api/compilar', { codigo });
+    if (!resultado) return;
+
+    const { tokens, simbolos, arvore, diagnosticos, clausulas } = resultado;
+    const erro = diagnosticos[0];
+    const lexico = erro?.fase === 'léxica';
+    const status = erro ? (lexico ? 'Erro léxico' : 'Erro sintático') : 'Compilado';
+
+    estado.linhasErro = diagnosticos.map(d => d.linha);
     atualizarLinhas();
 
-    renderTokens(ex.tokens);
-    renderSimbolos(ex.simbolos);
-    renderArvore(ex);
-    renderDiagnostico(ex.diagnostico);
+    renderTokens(tokens);
+    renderSimbolos(simbolos);
+    renderArvore(arvore);
+    renderDiagnosticos(diagnosticos, codigo);
 
-    $('badgeTokens').textContent = String(ex.tokens.length);
-    $('badgeSimbolos').textContent = String(ex.simbolos.length);
-    $('badgeArvore').textContent = ex.arvoreBadge;
-    $('badgeDiag').textContent = ex.diagnosticoBadge;
+    $('badgeTokens').textContent = String(tokens.length);
+    $('badgeSimbolos').textContent = String(simbolos.length);
+    $('badgeArvore').textContent = arvore ? (erro ? 'Parcial' : 'OK') : '✖';
+    $('badgeDiag').textContent = String(diagnosticos.length);
 
-    setTag('maquinaTag', ex.maquinaTag.texto, ex.maquinaTag.classe);
-    setTag('consoleTag', ex.id === 'valido' ? 'OK' : 'Erro', ex.id === 'valido' ? 'verde' : 'coral');
+    setTag('maquinaTag', status, erro ? (lexico ? 'ouro' : 'coral') : 'verde');
+    setTag('consoleTag', erro ? 'Erro' : 'OK', erro ? 'coral' : 'verde');
 
-    renderConsole(ex.consoleCompilar.banner, ex.consoleCompilar.bannerClasse, ex.consoleCompilar.linhas);
-    selecionarAba(ex.abaInicial, false);
+    renderConsole(
+      status.toUpperCase(),
+      erro ? 'err' : 'ok',
+      erro
+        ? diagnosticos.map(d => `${d.linha}:${d.coluna} · ${d.mensagem}`)
+        : [`${$('editorArquivo').textContent}: ${tokens.length} tokens, ${simbolos.length} símbolos, ${clausulas} cláusula(s).`]
+    );
+    selecionarAba(erro ? 'diagnostico' : 'tokens', false);
   }
 
-  function executarConsulta() {
-    if (estado.exemploId === 'personalizado') {
-      const consulta = $('inputConsulta').value.trim();
-      const msg = consulta
-        ? 'Execução de consulta personalizada ainda não integrada ao motor.'
-        : 'Informe uma consulta antes de executar.';
+  async function executarConsulta() {
+    const codigo = $('editorCodigo').value;
+    const consulta = $('inputConsulta').value;
+    if (!consulta.trim()) {
       setTag('consoleTag', 'Aviso', 'pessego');
-      renderConsole('PERSONALIZADO', 'edit', consulta ? [`?- ${consulta}`, msg] : [msg]);
+      renderConsole('AVISO', 'edit', ['Informe uma consulta antes de executar.']);
       return;
     }
 
-    const ex = EXEMPLOS[estado.exemploId];
-    const ok = ex.id === 'valido';
-    setTag('consoleTag', ok ? 'OK' : 'Bloqueada', ok ? 'verde' : 'coral');
-    renderConsole(ex.consoleConsulta.banner, ex.consoleConsulta.bannerClasse, ex.consoleConsulta.linhas);
+    const resultado = await enviar('/api/consultar', { codigo, consulta });
+    if (!resultado) return;
+
+    const linhas = [`?- ${consulta.trim().replace(/^\?-\s*/, '')}`, ''];
+    const { diagnosticos, origem, solucoes, saida, erro, limitada } = resultado;
+    if (saida) linhas.push(saida.replace(/\n$/, ''));
+    if (diagnosticos) {
+      if (origem === 'programa') {
+        estado.linhasErro = diagnosticos.map(d => d.linha);
+        atualizarLinhas();
+      }
+      for (const d of diagnosticos) {
+        linhas.push(`Erro (${d.linha}:${d.coluna}): ${d.mensagem}`);
+      }
+    } else {
+      const respostas = solucoes.map(s => Object.entries(s).map(([nome, valor]) => `${nome} = ${valor}`).join(', ') || 'true');
+      if (respostas.length) linhas.push(`${respostas.join(' ;\n')}.`);
+      else if (!erro) linhas.push('false.');
+      if (limitada) linhas.push('Exibindo as primeiras 100 soluções.');
+      if (erro) linhas.push(erro);
+    }
+
+    const falhou = Boolean(erro || diagnosticos);
+    renderConsole(falhou ? 'CONSULTA INTERROMPIDA' : 'CONSULTA', falhou ? 'err' : 'ok', linhas);
+    setTag('consoleTag', falhou ? 'Erro' : 'OK', falhou ? 'coral' : 'verde');
   }
 
-  function limparSaida() {
-    estado.compilado = false;
+  function limparSaida(msgMaquina, msgConsole) {
+    estado.requisicao++;
     estado.linhasErro = [];
     atualizarLinhas();
     setTag('maquinaTag', 'Aguardando', 'creme');
     setTag('consoleTag', 'Pronto', 'creme');
-    renderVazioMaquina('Saída limpa.');
-    renderConsole('CONSOLE', 'edit', ['Saída limpa.']);
+    renderVazioMaquina(msgMaquina || 'Saída limpa.');
+    renderConsole('PRONTO', 'edit', [msgConsole || 'Saída limpa.']);
   }
 
   function aoEditar() {
-    if (estado.exemploId !== 'personalizado' || estado.compilado) {
+    if (estado.exemploId !== 'personalizado') {
       ativarPersonalizado(false, false);
+    } else if (estado.linhasErro.length) {
+      limparSaida('Aguardando compilação.', 'Pronto.');
     } else {
       atualizarLinhas();
     }
@@ -330,7 +386,7 @@
 
   $('btnCompilar').addEventListener('click', compilar);
   $('btnExecutar').addEventListener('click', executarConsulta);
-  $('btnLimpar').addEventListener('click', limparSaida);
+  $('btnLimpar').addEventListener('click', () => limparSaida('Saída limpa.', 'Saída limpa.'));
 
   $('editorCodigo').addEventListener('input', aoEditar);
   $('editorCodigo').addEventListener('scroll', () => {
@@ -339,7 +395,6 @@
     $('editorBackdrop').scrollTop = top;
   });
 
-  $('inputConsulta').addEventListener('input', aoEditar);
   $('inputConsulta').addEventListener('keydown', e => {
     if (e.key === 'Enter') {
       e.preventDefault();
