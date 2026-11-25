@@ -1,22 +1,11 @@
-/* Dados fixos simulados para o protótipo da interface do Tradutor Prolog (Item 4). */
+/* Exemplos pré-programados para o Tradutor Prolog. */
 window.EXEMPLOS_PROLOG = {
   valido: {
     id: 'valido',
     titulo: 'Programa válido',
     arquivo: 'genealogia.pl',
-    descricao: 'Base genealógica válida com 5 fatos, 1 regra e consulta pronta para demonstração simulada.',
-    estadoCompilado: 'compilado',
-    statusTag: { texto: 'Compilado · Simulado', classe: 'verde' },
-    maquinaTag: { texto: 'Base pronta · Simulado', classe: 'verde' },
-    maquinaResumo: 'Análise léxica e sintática concluídas (simulado): 56 tokens, 12 símbolos e árvore completa.',
+    maquinaTag: { texto: 'Compilado', classe: 'verde' },
     abaInicial: 'tokens',
-    pipeline: {
-      programa: { texto: 'Válido', classe: 'ok' },
-      lexico: { texto: '56 tokens', classe: 'ok' },
-      sintatico: { texto: 'GLC ok', classe: 'ok' },
-      maquina: { texto: '6 cláusulas', classe: 'ok' },
-      console: { texto: 'Pronto', classe: 'ativo' }
-    },
     codigo: [
       '% Base de conhecimento: arvore genealogica',
       'pai(joao, maria).',
@@ -111,7 +100,7 @@ window.EXEMPLOS_PROLOG = {
     ],
     arvoreBadge: 'OK',
     arvore: {
-      resumo: 'Derivação completa a partir da GLC simplificada de Prolog (comentário da linha 1 ignorado pelo léxico).',
+      resumo: 'Derivação completa pela GLC.',
       raiz: {
         rotulo: '<Programa>',
         filhos: [
@@ -169,37 +158,30 @@ window.EXEMPLOS_PROLOG = {
     diagnostico: {
       tipo: 'ok',
       codigo: 'OK-000',
-      titulo: 'Compilação simulada concluída sem erros',
-      fase: 'Léxica + Sintática + Carga na Máquina',
+      titulo: 'Compilação concluída sem erros',
+      fase: 'Léxica + Sintática',
       local: 'Linhas 1–10',
-      lexema: '6 cláusulas válidas',
-      mensagem: 'Comentário da linha 1 descartado pelo AFD. Todas as cláusulas foram aceitas pela GLC e registradas na Máquina simulada.',
+      lexema: '6 cláusulas',
+      mensagem: 'Todas as cláusulas foram aceitas e carregadas na base de conhecimento.',
       trecho: 'Base carregada: pai/2 (4 fatos), mae/2 (1 fato), avo/2 (1 regra).',
-      sugestao: 'Acione "Executar consulta" no painel Consulta para visualizar a resposta simulada no Console.'
+      sugestao: 'Execute uma consulta no painel Consulta.'
     },
     consoleCompilar: {
-      banner: 'SAÍDA SIMULADA · COMPILAÇÃO OK',
+      banner: 'COMPILAÇÃO CONCLUÍDA',
       bannerClasse: 'ok',
       linhas: [
-        '[SIMULAÇÃO] Análise léxica concluída: 56 tokens e 12 símbolos (comentário da linha 1 ignorado).',
-        '[SIMULAÇÃO] Análise sintática concluída: 5 fatos e 1 regra carregados na Máquina.',
-        'Pronto para consultar. Clique em "Executar consulta" para avaliar ?- avo(joao, Neto).'
+        'genealogia.pl: 56 tokens, 12 símbolos, 6 cláusulas carregadas.'
       ]
     },
     consoleConsulta: {
-      banner: 'SAÍDA SIMULADA · RESPOSTA DA CONSULTA',
+      banner: 'CONSULTA',
       bannerClasse: 'ok',
       linhas: [
         '?- avo(joao, Neto).',
         '',
-        '[SIMULAÇÃO] Resolvendo objetivo avo(joao, Neto) com avo(X, Y) :- pai(X, Z), pai(Z, Y).',
-        '  1) Unificação: X = joao, Y = Neto',
-        '  2) Subobjetivo pai(joao, Z) -> Z = pedro (linha 3)',
-        '  3) Subobjetivo pai(pedro, Y) -> Y = lucas (linha 5) ; Y = sofia (linha 6)',
-        '',
         'Neto = lucas ;',
         'Neto = sofia.',
-        'true. (2 soluções — resultado fixo simulado)'
+        'true.'
       ]
     }
   },
@@ -208,19 +190,8 @@ window.EXEMPLOS_PROLOG = {
     id: 'erro-lexico',
     titulo: 'Erro léxico',
     arquivo: 'erro_lexico.pl',
-    descricao: 'Introduz o caractere inválido "$" em pai(X, $Z) para demonstrar rejeição pelo AFD e diagnóstico léxico.',
-    estadoCompilado: 'erro-lexico',
-    statusTag: { texto: 'Erro léxico · Simulado', classe: 'ouro' },
-    maquinaTag: { texto: 'Falha léxica · LEX-001', classe: 'ouro' },
-    maquinaResumo: 'Análise interrompida na etapa léxica (simulado): símbolo inválido "$" em linha 5, coluna 12.',
+    maquinaTag: { texto: 'Erro · LEX-001', classe: 'ouro' },
     abaInicial: 'diagnostico',
-    pipeline: {
-      programa: { texto: 'Carregado', classe: 'ok' },
-      lexico: { texto: 'LEX-001', classe: 'erro' },
-      sintatico: { texto: 'Interrompido', classe: 'erro' },
-      maquina: { texto: 'Bloqueada', classe: 'erro' },
-      console: { texto: 'Erro léxico', classe: 'erro' }
-    },
     codigo: [
       '% Exemplo com erro lexico: simbolo fora do alfabeto',
       'pai(joao, maria).',
@@ -262,7 +233,7 @@ window.EXEMPLOS_PROLOG = {
       { n: 26, lexema: '$', classe: 'ERRO_LEXICO', tipo: 'err', pos: '5:12', sym: 'ERRO', erro: true }
     ],
     simbolos: [
-      { id: 'S1', lexema: 'pai', categoria: 'Predicado', detalhe: 'aridade 2 (parcial)', linhas: '2, 5' },
+      { id: 'S1', lexema: 'pai', categoria: 'Predicado', detalhe: 'aridade 2', linhas: '2, 5' },
       { id: 'S2', lexema: 'joao', categoria: 'Átomo', detalhe: 'constante', linhas: '2' },
       { id: 'S3', lexema: 'maria', categoria: 'Átomo', detalhe: 'constante', linhas: '2, 3' },
       { id: 'S4', lexema: 'mae', categoria: 'Predicado', detalhe: 'aridade 2', linhas: '3' },
@@ -273,37 +244,32 @@ window.EXEMPLOS_PROLOG = {
     ],
     arvoreBadge: '✖',
     arvore: null,
-    arvoreIndisponivel: 'Árvore de derivação não gerada (simulado): a tradução foi interrompida pelo módulo de tratamento de erros na Análise Léxica (LEX-001, linha 5, coluna 12).',
+    arvoreIndisponivel: 'Árvore não gerada devido ao erro léxico LEX-001 (linha 5, coluna 12).',
     diagnosticoBadge: '1',
     diagnostico: {
       tipo: 'lex',
       codigo: 'LEX-001',
-      titulo: 'Erro léxico: símbolo fora do alfabeto aceito pelo AFD',
+      titulo: 'Símbolo fora do alfabeto',
       fase: 'Análise Léxica (AFD)',
       local: 'Linha 5, Coluna 12',
       lexema: '$',
-      mensagem: 'O autômato finito determinístico rejeitou o caractere "$" a partir do estado inicial q0 e registrou a ocorrência na tabela de erros.',
+      mensagem: 'Caractere "$" rejeitado pelo analisador léxico a partir do estado q0.',
       trecho: '5 |     pai(X, $Z),\n               ^ caractere inválido',
-      sugestao: 'Substitua "$Z" por uma variável Prolog válida iniciada por letra maiúscula ou sublinhado, como "Z".'
+      sugestao: 'Substitua "$Z" por uma variável válida, como "Z".'
     },
     consoleCompilar: {
-      banner: 'SAÍDA SIMULADA · ERRO LÉXICO (LEX-001)',
+      banner: 'ERRO LÉXICO · LEX-001',
       bannerClasse: 'err',
       linhas: [
-        '[SIMULAÇÃO] Falha na Análise Léxica em erro_lexico.pl (linha 5, coluna 12).',
-        'Erro LEX-001: caractere "$" não reconhecido pelo AFD.',
-        'Análise sintática e carga na Máquina foram interrompidas. Consulte a aba Diagnóstico.'
+        'erro_lexico.pl:5:12: caractere inválido \'$\'.'
       ]
     },
     consoleConsulta: {
-      banner: 'SAÍDA SIMULADA · CONSULTA BLOQUEADA',
+      banner: 'CONSULTA BLOQUEADA',
       bannerClasse: 'err',
       linhas: [
         '?- avo(joao, Neto).',
-        '',
-        '[SIMULAÇÃO] Não foi possível executar a consulta na Máquina.',
-        'Motivo: o exemplo carregado contém erro léxico (LEX-001 na linha 5, coluna 12).',
-        'Carregue o exemplo "Programa válido" para testar uma consulta bem-sucedida.'
+        'Corrija o erro léxico (LEX-001) antes de consultar.'
       ]
     }
   },
@@ -312,19 +278,8 @@ window.EXEMPLOS_PROLOG = {
     id: 'erro-sintatico',
     titulo: 'Erro sintático',
     arquivo: 'erro_sintatico.pl',
-    descricao: 'Todos os tokens são válidos, mas falta ")" antes de ":-" em avo(X, Y :- para demonstrar erro na GLC.',
-    estadoCompilado: 'erro-sintatico',
-    statusTag: { texto: 'Erro sintático · Simulado', classe: 'coral' },
-    maquinaTag: { texto: 'Falha sintática · SIN-002', classe: 'coral' },
-    maquinaResumo: 'Léxico concluído com 34 tokens válidos, mas a GLC rejeitou ":-" em linha 4, coluna 10 (simulado).',
+    maquinaTag: { texto: 'Erro · SIN-002', classe: 'coral' },
     abaInicial: 'diagnostico',
-    pipeline: {
-      programa: { texto: 'Carregado', classe: 'ok' },
-      lexico: { texto: '34 tokens', classe: 'ok' },
-      sintatico: { texto: 'SIN-002', classe: 'erro' },
-      maquina: { texto: 'Bloqueada', classe: 'erro' },
-      console: { texto: 'Erro sintático', classe: 'erro' }
-    },
     codigo: [
       '% Exemplo com erro sintatico: parentese nao fechado antes de :-',
       'pai(joao, maria).',
@@ -387,7 +342,7 @@ window.EXEMPLOS_PROLOG = {
     ],
     arvoreBadge: 'Parcial',
     arvore: {
-      resumo: 'Derivação parcial da GLC simplificada até o ponto de falha na cabeça da regra (linha 4, coluna 10).',
+      resumo: 'Derivação parcial até a linha 4, coluna 10.',
       raiz: {
         rotulo: '<Programa>',
         filhos: [
@@ -415,33 +370,27 @@ window.EXEMPLOS_PROLOG = {
     diagnostico: {
       tipo: 'sin',
       codigo: 'SIN-002',
-      titulo: 'Erro sintático: delimitador ")" ausente na cabeça da regra',
+      titulo: 'Delimitador ")" ausente na cabeça da regra',
       fase: 'Análise Sintática (GLC)',
       local: 'Linha 4, Coluna 10',
       lexema: ':- (OP_IMPLICA)',
-      mensagem: 'A produção <Predicado> ::= ATOMO "(" <ListaArgs> ")" esperava ")" ou "," após o argumento Y, mas recebeu ":-".',
+      mensagem: 'Esperado ")" ou "," após o argumento Y em <Predicado>, encontrado ":-".',
       trecho: '4 | avo(X, Y :-\n             ^^ esperado ")" antes de ":-"',
-      sugestao: 'Feche os parênteses da cabeça da regra escrevendo "avo(X, Y) :-" na linha 4.'
+      sugestao: 'Feche os parênteses escrevendo "avo(X, Y) :-" na linha 4.'
     },
     consoleCompilar: {
-      banner: 'SAÍDA SIMULADA · ERRO SINTÁTICO (SIN-002)',
+      banner: 'ERRO SINTÁTICO · SIN-002',
       bannerClasse: 'err',
       linhas: [
-        '[SIMULAÇÃO] Análise léxica concluída: 34 tokens válidos e 9 símbolos.',
-        '[SIMULAÇÃO] Falha na Análise Sintática em erro_sintatico.pl (linha 4, coluna 10).',
-        'Erro SIN-002: esperado ")" após argumento Y, encontrado ":-".',
-        'Carga na Máquina cancelada. Veja as abas Diagnóstico e Árvore parcial.'
+        'erro_sintatico.pl:4:10: esperado \')\' antes de \':-\'.'
       ]
     },
     consoleConsulta: {
-      banner: 'SAÍDA SIMULADA · CONSULTA BLOQUEADA',
+      banner: 'CONSULTA BLOQUEADA',
       bannerClasse: 'err',
       linhas: [
         '?- avo(joao, Neto).',
-        '',
-        '[SIMULAÇÃO] Não foi possível executar a consulta na Máquina.',
-        'Motivo: o exemplo carregado contém erro sintático (SIN-002 na linha 4, coluna 10).',
-        'Carregue o exemplo "Programa válido" para testar uma consulta bem-sucedida.'
+        'Corrija o erro sintático (SIN-002) antes de consultar.'
       ]
     }
   }
